@@ -4,7 +4,7 @@ const CONFIG = {
     system: {
         name: "KILLGORITHM",
         version: "1.0.0",
-        theme: "cyberpunk",
+        theme: "thrash-metal",
         defaultVolume: 0.7,
         fadeInDuration: 1000,
         fadeOutDuration: 500
@@ -22,11 +22,11 @@ const CONFIG = {
 
     // Visual Settings
     visual: {
-        particleCount: 100,
-        glitchIntensity: 0.3,
+        particleCount: 50,
+        glitchIntensity: 0.2,
         backgroundParallax: true,
         cursorTrails: true,
-        maxTrails: 10
+        maxTrails: 5
     },
 
     // Songs Configuration
@@ -39,14 +39,14 @@ const CONFIG = {
             audioFile: "audio/nemos-tears.mp3",
             videoFile: "",
             background: "backgrounds/killgorithm.png",
-            visualStyle: "cyberpunk",
-            animationType: "particle-system",
+            visualStyle: "thrash-aggressive",
+            animationType: "skull-particles",
             colorScheme: {
-                primary: "#00ff00",
-                secondary: "#00ffff",
-                accent: "#ff0080"
+                primary: "#ff0000",
+                secondary: "#000000",
+                accent: "#ffffff"
             },
-            effects: ["glitch", "scanlines"],
+            effects: ["skulls", "chains", "blood"],
             bpm: 140,
             intensity: 0.8
         },
@@ -57,15 +57,15 @@ const CONFIG = {
             duration: "4:30",
             audioFile: "audio/COURAGE MIX AUG 24.mp3",
             videoFile: "",
-            background: "backgrounds/killgorithm.png",
-            visualStyle: "matrix",
-            animationType: "matrix-rain",
+            background: "backgrounds/killgorithm2.png",
+            visualStyle: "thrash-dark",
+            animationType: "chain-rain",
             colorScheme: {
-                primary: "#00ff00",
-                secondary: "#ffffff",
-                accent: "#ff0000"
+                primary: "#000000",
+                secondary: "#ff0000",
+                accent: "#cccccc"
             },
-            effects: ["matrix", "data-stream"],
+            effects: ["chains", "spikes", "darkness"],
             bpm: 160,
             intensity: 0.9
         },
@@ -77,14 +77,14 @@ const CONFIG = {
             audioFile: "audio/AVE DE PRESA v10.mp3",
             videoFile: "",
             background: "backgrounds/killgorithm.png",
-            visualStyle: "apocalyptic",
-            animationType: "fire-particles",
+            visualStyle: "thrash-brutal",
+            animationType: "bone-explosion",
             colorScheme: {
-                primary: "#ff6600",
-                secondary: "#ff0000",
-                accent: "#ffff00"
+                primary: "#8b0000",
+                secondary: "#000000",
+                accent: "#ff6600"
             },
-            effects: ["fire", "smoke"],
+            effects: ["bones", "fire", "aggression"],
             bpm: 180,
             intensity: 1.0
         },
@@ -95,109 +95,117 @@ const CONFIG = {
             duration: "7:20",
             audioFile: "audio/To Hell & Back To Hel v8.mp3",
             videoFile: "",
-            background: "backgrounds/killgorithm.png",
-            visualStyle: "cosmic",
-            animationType: "space-particles",
+            background: "backgrounds/killgorithm2.png",
+            visualStyle: "thrash-infernal",
+            animationType: "hell-fire",
             colorScheme: {
-                primary: "#0000ff",
-                secondary: "#ffffff",
-                accent: "#ff00ff"
+                primary: "#ff0000",
+                secondary: "#000000",
+                accent: "#ff6600"
             },
-            effects: ["nebula", "stars"],
+            effects: ["fire", "demons", "hell"],
             bpm: 150,
             intensity: 0.85
         }
     ],
 
-    // Visual Themes
+    // Visual Themes - Authentic Thrash Metal
     themes: {
-        cyberpunk: {
-            name: "Cyberpunk",
+        "thrash-aggressive": {
+            name: "Thrash Aggressive",
             colors: {
-                primary: "#00ff00",
-                secondary: "#00ffff",
-                accent: "#ff0080",
+                primary: "#ff0000",
+                secondary: "#000000",
+                accent: "#ffffff",
                 background: "#000000",
-                text: "#00ff00"
+                text: "#ff0000"
             },
-            effects: ["neon", "glitch", "scanlines"]
+            effects: ["skulls", "chains", "blood", "aggression"]
         },
-        apocalyptic: {
-            name: "Apocalyptic",
+        "thrash-dark": {
+            name: "Thrash Dark",
             colors: {
-                primary: "#ff6600",
+                primary: "#000000",
                 secondary: "#ff0000",
-                accent: "#ffff00",
-                background: "#1a0f00",
-                text: "#ff6600"
-            },
-            effects: ["fire", "smoke", "dust"]
-        },
-        matrix: {
-            name: "Matrix",
-            colors: {
-                primary: "#00ff00",
-                secondary: "#ffffff",
-                accent: "#ff0000",
+                accent: "#cccccc",
                 background: "#000000",
-                text: "#00ff00"
-            },
-            effects: ["matrix-rain", "data-stream", "glitch"]
-        },
-        cosmic: {
-            name: "Cosmic",
-            colors: {
-                primary: "#0000ff",
-                secondary: "#ffffff",
-                accent: "#ff00ff",
-                background: "#000011",
                 text: "#ffffff"
             },
-            effects: ["nebula", "stars", "wormhole"]
+            effects: ["chains", "spikes", "darkness", "metal"]
+        },
+        "thrash-brutal": {
+            name: "Thrash Brutal",
+            colors: {
+                primary: "#8b0000",
+                secondary: "#000000",
+                accent: "#ff6600",
+                background: "#000000",
+                text: "#ff0000"
+            },
+            effects: ["bones", "fire", "aggression", "brutality"]
+        },
+        "thrash-infernal": {
+            name: "Thrash Infernal",
+            colors: {
+                primary: "#ff0000",
+                secondary: "#000000",
+                accent: "#ff6600",
+                background: "#000000",
+                text: "#ff0000"
+            },
+            effects: ["fire", "demons", "hell", "infernal"]
         }
     },
 
-    // Animation Presets
+    // Animation Presets - Thrash Metal Specific
     animations: {
-        particleSystem: {
-            count: 100,
-            speed: 2,
-            size: { min: 1, max: 5 },
-            opacity: { min: 0.3, max: 1.0 },
-            colors: ["#00ff00", "#00ffff", "#ff0080"]
-        },
-        matrixRain: {
-            characters: "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン",
-            speed: 1.5,
-            fontSize: 14,
-            color: "#00ff00"
-        },
-        fireParticles: {
-            count: 50,
+        skullParticles: {
+            count: 30,
             speed: 3,
-            size: { min: 2, max: 8 },
-            colors: ["#ff6600", "#ff0000", "#ffff00"]
+            size: { min: 20, max: 40 },
+            opacity: { min: 0.7, max: 1.0 },
+            colors: ["#ff0000", "#000000", "#ffffff"],
+            symbols: ["💀", "☠️", "⚰️", "🦴"]
         },
-        spaceParticles: {
-            count: 200,
-            speed: 1,
-            size: { min: 1, max: 3 },
-            colors: ["#ffffff", "#0000ff", "#ff00ff"]
+        chainRain: {
+            count: 20,
+            speed: 4,
+            size: { min: 15, max: 30 },
+            opacity: { min: 0.8, max: 1.0 },
+            colors: ["#cccccc", "#888888", "#444444"],
+            symbols: ["⛓️", "🔗", "⚡", "🗡️"]
+        },
+        boneExplosion: {
+            count: 25,
+            speed: 5,
+            size: { min: 25, max: 50 },
+            opacity: { min: 0.6, max: 1.0 },
+            colors: ["#ffffff", "#cccccc", "#ff6600"],
+            symbols: ["🦴", "💀", "⚰️", "🔥"]
+        },
+        hellFire: {
+            count: 40,
+            speed: 6,
+            size: { min: 30, max: 60 },
+            opacity: { min: 0.5, max: 1.0 },
+            colors: ["#ff0000", "#ff6600", "#8b0000"],
+            symbols: ["🔥", "👹", "😈", "⚡"]
         }
     },
 
-    // UI Elements
+    // UI Elements - Thrash Metal Styling
     ui: {
         buttons: {
-            hoverEffect: "glow",
-            clickEffect: "ripple",
-            transitionDuration: 0.3
+            hoverEffect: "blood-drip",
+            clickEffect: "skull-burst",
+            transitionDuration: 0.2
         },
         cursor: {
             enabled: true,
             trail: true,
-            maxTrails: 10,
-            trailFade: 0.8
+            maxTrails: 5,
+            trailFade: 0.9,
+            style: "skull"
         },
         loading: {
             duration: 3000,
@@ -207,7 +215,7 @@ const CONFIG = {
 
     // Performance Settings
     performance: {
-        maxParticles: 500,
+        maxParticles: 200,
         maxAudioSources: 5,
         enableWebGL: true,
         enableAudioContext: true,

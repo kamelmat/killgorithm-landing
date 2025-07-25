@@ -134,29 +134,29 @@ class VisualEffectsManager {
 
     // Particle System Methods
     createParticleSystem(type, options = {}) {
-        const config = CONFIG.animations[type] || CONFIG.animations.particleSystem;
+        const config = CONFIG.animations[type] || CONFIG.animations.skullParticles;
         const mergedOptions = { ...config, ...options };
         
         switch (type) {
-            case 'particleSystem':
-                return this.createBasicParticleSystem(mergedOptions);
-            case 'matrixRain':
-                return this.createMatrixRain(mergedOptions);
-            case 'fireParticles':
-                return this.createFireParticles(mergedOptions);
-            case 'spaceParticles':
-                return this.createSpaceParticles(mergedOptions);
+            case 'skullParticles':
+                return this.createSkullParticles(mergedOptions);
+            case 'chainRain':
+                return this.createChainRain(mergedOptions);
+            case 'boneExplosion':
+                return this.createBoneExplosion(mergedOptions);
+            case 'hellFire':
+                return this.createHellFire(mergedOptions);
             default:
-                return this.createBasicParticleSystem(mergedOptions);
+                return this.createSkullParticles(mergedOptions);
         }
     }
 
-    createBasicParticleSystem(options) {
+    createSkullParticles(options) {
         const particles = [];
         const container = document.getElementById('particle-container');
         
         for (let i = 0; i < options.count; i++) {
-            const particle = this.createParticle(options);
+            const particle = this.createSkullParticle(options);
             particles.push(particle);
             container.appendChild(particle);
         }
@@ -164,7 +164,7 @@ class VisualEffectsManager {
         // Animate particles
         const animate = () => {
             particles.forEach(particle => {
-                this.updateParticle(particle, options);
+                this.updateSkullParticle(particle, options);
             });
             this.animationId = requestAnimationFrame(animate);
         };
@@ -173,14 +173,18 @@ class VisualEffectsManager {
         return particles;
     }
 
-    createParticle(options) {
+    createSkullParticle(options) {
         const particle = document.createElement('div');
+        const symbol = options.symbols[Math.floor(Math.random() * options.symbols.length)];
+        
+        particle.textContent = symbol;
         particle.style.position = 'absolute';
-        particle.style.width = (Math.random() * (options.size.max - options.size.min) + options.size.min) + 'px';
-        particle.style.height = particle.style.width;
-        particle.style.background = options.colors[Math.floor(Math.random() * options.colors.length)];
-        particle.style.borderRadius = '50%';
+        particle.style.fontSize = (Math.random() * (options.size.max - options.size.min) + options.size.min) + 'px';
+        particle.style.color = options.colors[Math.floor(Math.random() * options.colors.length)];
         particle.style.opacity = Math.random() * (options.opacity.max - options.opacity.min) + options.opacity.min;
+        particle.style.textShadow = '0 0 10px #ff0000';
+        particle.style.pointerEvents = 'none';
+        particle.style.zIndex = '1000';
         
         // Initial position
         particle.style.left = Math.random() * window.innerWidth + 'px';
@@ -189,11 +193,13 @@ class VisualEffectsManager {
         // Velocity
         particle.vx = (Math.random() - 0.5) * options.speed;
         particle.vy = (Math.random() - 0.5) * options.speed;
+        particle.rotation = 0;
+        particle.rotationSpeed = (Math.random() - 0.5) * 10;
         
         return particle;
     }
 
-    updateParticle(particle, options) {
+    updateSkullParticle(particle, options) {
         const x = parseFloat(particle.style.left);
         const y = parseFloat(particle.style.top);
         
@@ -201,45 +207,69 @@ class VisualEffectsManager {
         particle.style.left = (x + particle.vx) + 'px';
         particle.style.top = (y + particle.vy) + 'px';
         
+        // Update rotation
+        particle.rotation += particle.rotationSpeed;
+        particle.style.transform = `rotate(${particle.rotation}deg)`;
+        
         // Wrap around screen
-        if (x < -10) particle.style.left = window.innerWidth + 'px';
-        if (x > window.innerWidth + 10) particle.style.left = '-10px';
-        if (y < -10) particle.style.top = window.innerHeight + 'px';
-        if (y > window.innerHeight + 10) particle.style.top = '-10px';
+        if (x < -50) particle.style.left = window.innerWidth + 'px';
+        if (x > window.innerWidth + 50) particle.style.left = '-50px';
+        if (y < -50) particle.style.top = window.innerHeight + 'px';
+        if (y > window.innerHeight + 50) particle.style.top = '-50px';
     }
 
-    createMatrixRain(options) {
+    createChainRain(options) {
+        const particles = [];
         const container = document.getElementById('particle-container');
-        const columns = Math.floor(window.innerWidth / options.fontSize);
-        const drops = new Array(columns).fill(0);
+        
+        for (let i = 0; i < options.count; i++) {
+            const particle = document.createElement('div');
+            const symbol = options.symbols[Math.floor(Math.random() * options.symbols.length)];
+            
+            particle.textContent = symbol;
+            particle.style.position = 'absolute';
+            particle.style.fontSize = (Math.random() * (options.size.max - options.size.min) + options.size.min) + 'px';
+            particle.style.color = options.colors[Math.floor(Math.random() * options.colors.length)];
+            particle.style.opacity = options.opacity.max;
+            particle.style.textShadow = '0 0 5px #cccccc';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '1000';
+            
+            // Start from top of screen
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.top = '-50px';
+            
+            // Chain-like movement
+            particle.vy = Math.random() * options.speed + 2;
+            particle.vx = (Math.random() - 0.5) * 1;
+            particle.swing = Math.random() * Math.PI * 2;
+            particle.swingSpeed = Math.random() * 0.1 + 0.05;
+            
+            particles.push(particle);
+            container.appendChild(particle);
+        }
         
         const animate = () => {
-            // Create new characters
-            for (let i = 0; i < drops.length; i++) {
-                if (Math.random() > 0.975) {
-                    const char = document.createElement('div');
-                    char.textContent = options.characters[Math.floor(Math.random() * options.characters.length)];
-                    char.style.position = 'absolute';
-                    char.style.left = (i * options.fontSize) + 'px';
-                    char.style.top = (drops[i] * options.fontSize) + 'px';
-                    char.style.color = options.color;
-                    char.style.fontSize = options.fontSize + 'px';
-                    char.style.fontFamily = 'monospace';
-                    char.style.opacity = '0.8';
-                    char.style.textShadow = `0 0 5px ${options.color}`;
-                    
-                    container.appendChild(char);
-                    
-                    // Remove character after animation
-                    setTimeout(() => {
-                        if (char.parentNode) {
-                            char.parentNode.removeChild(char);
-                        }
-                    }, 2000);
-                    
-                    drops[i]++;
+            particles.forEach((particle, index) => {
+                const x = parseFloat(particle.style.left);
+                const y = parseFloat(particle.style.top);
+                
+                // Update swing
+                particle.swing += particle.swingSpeed;
+                const swingX = Math.sin(particle.swing) * 20;
+                
+                // Update position
+                particle.style.left = (x + particle.vx + swingX * 0.1) + 'px';
+                particle.style.top = (y + particle.vy) + 'px';
+                
+                // Remove if off screen
+                if (y > window.innerHeight + 50) {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                    particles.splice(index, 1);
                 }
-            }
+            });
             
             this.animationId = requestAnimationFrame(animate);
         };
@@ -247,27 +277,37 @@ class VisualEffectsManager {
         animate();
     }
 
-    createFireParticles(options) {
+    createBoneExplosion(options) {
         const particles = [];
         const container = document.getElementById('particle-container');
         
         for (let i = 0; i < options.count; i++) {
             const particle = document.createElement('div');
+            const symbol = options.symbols[Math.floor(Math.random() * options.symbols.length)];
+            
+            particle.textContent = symbol;
             particle.style.position = 'absolute';
-            particle.style.width = (Math.random() * (options.size.max - options.size.min) + options.size.min) + 'px';
-            particle.style.height = particle.style.width;
-            particle.style.background = options.colors[Math.floor(Math.random() * options.colors.length)];
-            particle.style.borderRadius = '50%';
-            particle.style.opacity = '0.8';
+            particle.style.fontSize = (Math.random() * (options.size.max - options.size.min) + options.size.min) + 'px';
+            particle.style.color = options.colors[Math.floor(Math.random() * options.colors.length)];
+            particle.style.opacity = options.opacity.max;
+            particle.style.textShadow = '0 0 10px #ffffff';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '1000';
             
-            // Start from bottom of screen
-            particle.style.left = Math.random() * window.innerWidth + 'px';
-            particle.style.top = window.innerHeight + 'px';
+            // Start from center
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            particle.style.left = centerX + 'px';
+            particle.style.top = centerY + 'px';
             
-            // Fire-like movement
-            particle.vx = (Math.random() - 0.5) * 2;
-            particle.vy = -Math.random() * options.speed - 1;
+            // Explosion movement
+            const angle = (Math.PI * 2 * i) / options.count;
+            const velocity = Math.random() * options.speed + 3;
+            particle.vx = Math.cos(angle) * velocity;
+            particle.vy = Math.sin(angle) * velocity;
             particle.life = 1.0;
+            particle.rotation = 0;
+            particle.rotationSpeed = (Math.random() - 0.5) * 20;
             
             particles.push(particle);
             container.appendChild(particle);
@@ -282,12 +322,16 @@ class VisualEffectsManager {
                 particle.style.left = (x + particle.vx) + 'px';
                 particle.style.top = (y + particle.vy) + 'px';
                 
+                // Update rotation
+                particle.rotation += particle.rotationSpeed;
+                particle.style.transform = `rotate(${particle.rotation}deg)`;
+                
                 // Fade out
-                particle.life -= 0.01;
+                particle.life -= 0.02;
                 particle.style.opacity = particle.life;
                 
                 // Remove dead particles
-                if (particle.life <= 0 || y < -10) {
+                if (particle.life <= 0) {
                     if (particle.parentNode) {
                         particle.parentNode.removeChild(particle);
                     }
@@ -301,34 +345,39 @@ class VisualEffectsManager {
         animate();
     }
 
-    createSpaceParticles(options) {
+    createHellFire(options) {
         const particles = [];
         const container = document.getElementById('particle-container');
         
         for (let i = 0; i < options.count; i++) {
             const particle = document.createElement('div');
+            const symbol = options.symbols[Math.floor(Math.random() * options.symbols.length)];
+            
+            particle.textContent = symbol;
             particle.style.position = 'absolute';
-            particle.style.width = (Math.random() * (options.size.max - options.size.min) + options.size.min) + 'px';
-            particle.style.height = particle.style.width;
-            particle.style.background = options.colors[Math.floor(Math.random() * options.colors.length)];
-            particle.style.borderRadius = '50%';
-            particle.style.opacity = '0.6';
-            particle.style.boxShadow = `0 0 ${Math.random() * 5 + 2}px ${options.colors[Math.floor(Math.random() * options.colors.length)]}`;
+            particle.style.fontSize = (Math.random() * (options.size.max - options.size.min) + options.size.min) + 'px';
+            particle.style.color = options.colors[Math.floor(Math.random() * options.colors.length)];
+            particle.style.opacity = options.opacity.max;
+            particle.style.textShadow = '0 0 15px #ff0000';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '1000';
             
-            // Random position
+            // Start from bottom
             particle.style.left = Math.random() * window.innerWidth + 'px';
-            particle.style.top = Math.random() * window.innerHeight + 'px';
+            particle.style.top = window.innerHeight + 'px';
             
-            // Slow movement
-            particle.vx = (Math.random() - 0.5) * options.speed;
-            particle.vy = (Math.random() - 0.5) * options.speed;
+            // Fire movement
+            particle.vy = -Math.random() * options.speed - 1;
+            particle.vx = (Math.random() - 0.5) * 2;
+            particle.life = 1.0;
+            particle.flicker = 0;
             
             particles.push(particle);
             container.appendChild(particle);
         }
         
         const animate = () => {
-            particles.forEach(particle => {
+            particles.forEach((particle, index) => {
                 const x = parseFloat(particle.style.left);
                 const y = parseFloat(particle.style.top);
                 
@@ -336,11 +385,21 @@ class VisualEffectsManager {
                 particle.style.left = (x + particle.vx) + 'px';
                 particle.style.top = (y + particle.vy) + 'px';
                 
-                // Wrap around screen
-                if (x < -10) particle.style.left = window.innerWidth + 'px';
-                if (x > window.innerWidth + 10) particle.style.left = '-10px';
-                if (y < -10) particle.style.top = window.innerHeight + 'px';
-                if (y > window.innerHeight + 10) particle.style.top = '-10px';
+                // Flicker effect
+                particle.flicker += 0.2;
+                const flickerIntensity = Math.sin(particle.flicker) * 0.3 + 0.7;
+                particle.style.opacity = particle.life * flickerIntensity;
+                
+                // Fade out
+                particle.life -= 0.01;
+                
+                // Remove dead particles
+                if (particle.life <= 0 || y < -50) {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                    particles.splice(index, 1);
+                }
             });
             
             this.animationId = requestAnimationFrame(animate);

@@ -185,84 +185,108 @@ class BackgroundEngine {
     }
 
     // Create different background styles
-    createBackground(style = 'cyberpunk') {
+    createBackground(style = 'thrash-aggressive') {
         this.currentStyle = style;
         this.clearScene();
 
         switch (style) {
-            case 'cyberpunk':
-                this.createCyberpunkBackground();
+            case 'thrash-aggressive':
+                this.createThrashAggressiveBackground();
                 break;
-            case 'matrix':
-                this.createMatrixBackground();
+            case 'thrash-dark':
+                this.createThrashDarkBackground();
                 break;
-            case 'apocalyptic':
-                this.createApocalypticBackground();
+            case 'thrash-brutal':
+                this.createThrashBrutalBackground();
                 break;
-            case 'cosmic':
-                this.createCosmicBackground();
+            case 'thrash-infernal':
+                this.createThrashInfernalBackground();
                 break;
             default:
-                this.createCyberpunkBackground();
+                this.createThrashAggressiveBackground();
         }
 
         this.animate();
     }
 
-    createCyberpunkBackground() {
-        // Create animated plane
-        const geometry = new THREE.PlaneGeometry(20, 20, 50, 50);
-        const material = this.materials.cyberpunk;
-        const mesh = new THREE.Mesh(geometry, material);
-        this.scene.add(mesh);
-        this.meshes.background = mesh;
-
-        // Create particle system
-        this.createParticleSystem(100, 0x00ff00, 0x00ffff, 0xff0080);
-    }
-
-    createMatrixBackground() {
-        // Create matrix rain effect
+    createThrashAggressiveBackground() {
+        // Create background with killgorithm image
         const geometry = new THREE.PlaneGeometry(20, 20);
-        const material = new THREE.MeshBasicMaterial({
-            color: 0x00ff00,
-            transparent: true,
-            opacity: 0.1
+        const textureLoader = new THREE.TextureLoader();
+        
+        textureLoader.load('backgrounds/killgorithm.png', (texture) => {
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.3
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            this.scene.add(mesh);
+            this.meshes.background = mesh;
         });
-        const mesh = new THREE.Mesh(geometry, material);
-        this.scene.add(mesh);
 
-        // Create falling characters
-        this.createMatrixRain();
+        // Create aggressive particle system
+        this.createParticleSystem(50, 0xff0000, 0x000000, 0xffffff);
     }
 
-    createApocalypticBackground() {
-        // Create fire-like background
+    createThrashDarkBackground() {
+        // Create background with killgorithm2 image
         const geometry = new THREE.PlaneGeometry(20, 20);
-        const material = new THREE.MeshBasicMaterial({
-            color: 0xff6600,
-            transparent: true,
-            opacity: 0.3
+        const textureLoader = new THREE.TextureLoader();
+        
+        textureLoader.load('backgrounds/killgorithm2.png', (texture) => {
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.4
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            this.scene.add(mesh);
+            this.meshes.background = mesh;
         });
-        const mesh = new THREE.Mesh(geometry, material);
-        this.scene.add(mesh);
 
-        // Create fire particles
-        this.createFireParticles();
+        // Create dark particle system
+        this.createParticleSystem(40, 0x000000, 0xff0000, 0xcccccc);
     }
 
-    createCosmicBackground() {
-        // Create space background
-        const geometry = new THREE.SphereGeometry(50, 32, 32);
-        const material = new THREE.MeshBasicMaterial({
-            color: 0x000011,
-            side: THREE.BackSide
+    createThrashBrutalBackground() {
+        // Create background with killgorithm image
+        const geometry = new THREE.PlaneGeometry(20, 20);
+        const textureLoader = new THREE.TextureLoader();
+        
+        textureLoader.load('backgrounds/killgorithm.png', (texture) => {
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.5
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            this.scene.add(mesh);
+            this.meshes.background = mesh;
         });
-        const mesh = new THREE.Mesh(geometry, material);
-        this.scene.add(mesh);
 
-        // Create stars
-        this.createStarField();
+        // Create brutal particle system
+        this.createParticleSystem(60, 0x8b0000, 0x000000, 0xff6600);
+    }
+
+    createThrashInfernalBackground() {
+        // Create background with killgorithm2 image
+        const geometry = new THREE.PlaneGeometry(20, 20);
+        const textureLoader = new THREE.TextureLoader();
+        
+        textureLoader.load('backgrounds/killgorithm2.png', (texture) => {
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.6
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            this.scene.add(mesh);
+            this.meshes.background = mesh;
+        });
+
+        // Create infernal particle system
+        this.createParticleSystem(70, 0xff0000, 0x000000, 0xff6600);
     }
 
     createParticleSystem(count, color1, color2, color3) {

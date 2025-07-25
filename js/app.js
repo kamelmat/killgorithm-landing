@@ -388,22 +388,22 @@ class KillgorithmApp {
         // Trigger effects based on song intensity
         const intensity = currentSong.intensity || 0.5;
         
-        // Create particle system based on song type
+        // Create thrash metal particle system based on song type
         switch (currentSong.animationType) {
-            case 'particle-system':
-                window.visualEffects.createParticleSystem('particleSystem', {
-                    count: Math.floor(intensity * 100),
-                    speed: intensity * 2
+            case 'skull-particles':
+                window.visualEffects.createParticleSystem('skullParticles', {
+                    count: Math.floor(intensity * 30),
+                    speed: intensity * 3
                 });
                 break;
-            case 'matrix-rain':
-                window.visualEffects.createParticleSystem('matrixRain');
+            case 'chain-rain':
+                window.visualEffects.createParticleSystem('chainRain');
                 break;
-            case 'fire-particles':
-                window.visualEffects.createParticleSystem('fireParticles');
+            case 'bone-explosion':
+                window.visualEffects.createParticleSystem('boneExplosion');
                 break;
-            case 'space-particles':
-                window.visualEffects.createParticleSystem('spaceParticles');
+            case 'hell-fire':
+                window.visualEffects.createParticleSystem('hellFire');
                 break;
         }
     }

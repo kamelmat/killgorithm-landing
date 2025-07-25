@@ -6,35 +6,50 @@
 }
 
 body {
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Orbitron', sans-serif;
     background: #000;
-    color: #00ff00;
+    color: #ff0000;
     overflow: hidden;
     cursor: none;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(255,0,0,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,0,0,0.1) 0%, transparent 50%);
 }
 
-/* Custom Cursor */
+/* Custom Cursor - Skull Style */
 .custom-cursor {
     position: fixed;
-    width: 20px;
-    height: 20px;
-    background: #00ff00;
+    width: 30px;
+    height: 30px;
+    background: #ff0000;
     border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
     mix-blend-mode: difference;
     transition: transform 0.1s ease;
+    box-shadow: 0 0 10px #ff0000;
+}
+
+.custom-cursor::before {
+    content: '💀';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    color: #000;
 }
 
 .cursor-trail {
     position: fixed;
-    width: 4px;
-    height: 4px;
-    background: #00ff00;
+    width: 6px;
+    height: 6px;
+    background: #ff0000;
     border-radius: 50%;
     pointer-events: none;
     z-index: 9998;
-    opacity: 0.6;
+    opacity: 0.8;
+    box-shadow: 0 0 5px #ff0000;
 }
 
 /* Loading Screen */
@@ -50,6 +65,10 @@ body {
     justify-content: center;
     z-index: 10000;
     transition: opacity 0.5s ease;
+    background-image: 
+        linear-gradient(45deg, transparent 49%, rgba(255,0,0,0.1) 50%, transparent 51%),
+        linear-gradient(-45deg, transparent 49%, rgba(255,0,0,0.1) 50%, transparent 51%);
+    background-size: 20px 20px;
 }
 
 .loading-content {
@@ -58,24 +77,27 @@ body {
 
 .loading-bar {
     width: 300px;
-    height: 4px;
-    background: #1a1a1a;
+    height: 6px;
+    background: #1a0000;
     margin: 20px auto;
     position: relative;
     overflow: hidden;
+    border: 1px solid #ff0000;
 }
 
 .loading-progress {
     height: 100%;
-    background: linear-gradient(90deg, #00ff00, #00ffff);
+    background: linear-gradient(90deg, #ff0000, #8b0000);
     width: 0%;
     transition: width 0.3s ease;
+    box-shadow: 0 0 10px #ff0000;
 }
 
 .loading-text {
     font-size: 14px;
-    color: #666;
+    color: #ff0000;
     margin-top: 10px;
+    text-shadow: 0 0 5px #ff0000;
 }
 
 /* App Container */
@@ -124,7 +146,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+    background: 
+        radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.7) 100%),
+        linear-gradient(0deg, rgba(255,0,0,0.1) 0%, transparent 50%);
     z-index: 2;
 }
 
@@ -140,12 +164,17 @@ body {
     padding: 20px;
 }
 
-/* Glitch Text Effect */
+/* Thrash Metal Text Effect */
 .glitch-text {
     position: relative;
-    color: #00ff00;
-    text-shadow: 0 0 10px #00ff00;
-    animation: glitch 2s infinite;
+    color: #ff0000;
+    text-shadow: 
+        0 0 10px #ff0000,
+        0 0 20px #ff0000,
+        0 0 30px #ff0000;
+    animation: thrash-glitch 3s infinite;
+    font-weight: 900;
+    letter-spacing: 0.1em;
 }
 
 .glitch-text::before,
@@ -159,18 +188,33 @@ body {
 }
 
 .glitch-text::before {
-    animation: glitch-1 0.5s infinite;
-    color: #ff0000;
+    animation: thrash-glitch-1 0.3s infinite;
+    color: #ffffff;
     z-index: -1;
+    text-shadow: 2px 0 #ff0000;
 }
 
 .glitch-text::after {
-    animation: glitch-2 0.5s infinite;
-    color: #0000ff;
+    animation: thrash-glitch-2 0.3s infinite;
+    color: #000000;
     z-index: -2;
+    text-shadow: -2px 0 #ff0000;
 }
 
-@keyframes glitch {
+@keyframes thrash-glitch {
+    0%, 100% { transform: translate(0); }
+    10% { transform: translate(-1px, 1px); }
+    20% { transform: translate(1px, -1px); }
+    30% { transform: translate(-1px, -1px); }
+    40% { transform: translate(1px, 1px); }
+    50% { transform: translate(-1px, 1px); }
+    60% { transform: translate(1px, -1px); }
+    70% { transform: translate(-1px, -1px); }
+    80% { transform: translate(1px, 1px); }
+    90% { transform: translate(-1px, 1px); }
+}
+
+@keyframes thrash-glitch-1 {
     0%, 100% { transform: translate(0); }
     20% { transform: translate(-2px, 2px); }
     40% { transform: translate(-2px, -2px); }
@@ -178,15 +222,7 @@ body {
     80% { transform: translate(2px, -2px); }
 }
 
-@keyframes glitch-1 {
-    0%, 100% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
-}
-
-@keyframes glitch-2 {
+@keyframes thrash-glitch-2 {
     0%, 100% { transform: translate(0); }
     20% { transform: translate(2px, -2px); }
     40% { transform: translate(2px, 2px); }
@@ -206,22 +242,27 @@ body {
     font-weight: 900;
     margin-bottom: 10px;
     letter-spacing: 0.2em;
+    text-shadow: 
+        0 0 10px #ff0000,
+        0 0 20px #ff0000,
+        0 0 30px #ff0000;
 }
 
 .tagline {
     font-size: 1.2rem;
-    color: #666;
+    color: #cccccc;
     letter-spacing: 0.1em;
+    text-shadow: 0 0 5px #ff0000;
 }
 
-/* Cyber Buttons */
+/* Thrash Metal Buttons */
 .cyber-button {
     position: relative;
     background: transparent;
-    border: 2px solid #00ff00;
-    color: #00ff00;
+    border: 3px solid #ff0000;
+    color: #ff0000;
     padding: 15px 30px;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Orbitron', sans-serif;
     font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -230,6 +271,8 @@ body {
     transition: all 0.3s ease;
     margin: 10px;
     min-width: 200px;
+    text-shadow: 0 0 5px #ff0000;
+    box-shadow: 0 0 10px rgba(255,0,0,0.3);
 }
 
 .cyber-button::before {
@@ -239,7 +282,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0,255,0,0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,0,0,0.3), transparent);
     transition: left 0.5s ease;
 }
 
@@ -248,10 +291,11 @@ body {
 }
 
 .cyber-button:hover {
-    background: #00ff00;
+    background: #ff0000;
     color: #000;
-    box-shadow: 0 0 20px #00ff00;
-    transform: translateY(-2px);
+    box-shadow: 0 0 30px #ff0000;
+    transform: translateY(-3px);
+    text-shadow: none;
 }
 
 .cyber-button.small {
@@ -271,13 +315,13 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: #00ff00;
+    background: #ff0000;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .cyber-button:hover .button-glow {
-    opacity: 0.1;
+    opacity: 0.2;
 }
 
 /* Action Buttons */
@@ -302,6 +346,9 @@ body {
     font-family: 'Orbitron', sans-serif;
     font-size: 2.5rem;
     font-weight: 700;
+    text-shadow: 
+        0 0 10px #ff0000,
+        0 0 20px #ff0000;
 }
 
 .songs-grid {
@@ -316,13 +363,14 @@ body {
 }
 
 .song-card {
-    background: rgba(0,0,0,0.8);
-    border: 1px solid #00ff00;
+    background: rgba(0,0,0,0.9);
+    border: 2px solid #ff0000;
     padding: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 0 15px rgba(255,0,0,0.3);
 }
 
 .song-card::before {
@@ -332,7 +380,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(45deg, transparent, rgba(0,255,0,0.1), transparent);
+    background: linear-gradient(45deg, transparent, rgba(255,0,0,0.1), transparent);
     transform: translateX(-100%);
     transition: transform 0.5s ease;
 }
@@ -343,20 +391,21 @@ body {
 
 .song-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0,255,0,0.3);
-    border-color: #00ffff;
+    box-shadow: 0 10px 30px rgba(255,0,0,0.5);
+    border-color: #ffffff;
 }
 
 .song-title {
     font-size: 1.2rem;
     font-weight: bold;
     margin-bottom: 10px;
-    color: #00ff00;
+    color: #ff0000;
+    text-shadow: 0 0 5px #ff0000;
 }
 
 .song-duration {
     font-size: 0.9rem;
-    color: #666;
+    color: #cccccc;
 }
 
 /* Playback View */
@@ -365,9 +414,10 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.95);
     padding: 20px;
     z-index: 4;
+    border-top: 2px solid #ff0000;
 }
 
 .song-info {
@@ -377,12 +427,13 @@ body {
 
 .song-info h3 {
     font-size: 1.5rem;
-    color: #00ff00;
+    color: #ff0000;
     margin-bottom: 5px;
+    text-shadow: 0 0 10px #ff0000;
 }
 
 .song-info p {
-    color: #666;
+    color: #cccccc;
     font-size: 1rem;
 }
 
@@ -396,20 +447,22 @@ body {
 
 .control-btn {
     background: transparent;
-    border: 1px solid #00ff00;
-    color: #00ff00;
+    border: 2px solid #ff0000;
+    color: #ff0000;
     width: 50px;
     height: 50px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 1.2rem;
     transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(255,0,0,0.3);
 }
 
 .control-btn:hover {
-    background: #00ff00;
+    background: #ff0000;
     color: #000;
-    box-shadow: 0 0 15px #00ff00;
+    box-shadow: 0 0 20px #ff0000;
+    transform: scale(1.1);
 }
 
 .progress-container {
@@ -420,25 +473,27 @@ body {
 
 .progress-bar {
     width: 100%;
-    height: 4px;
-    background: #333;
-    border-radius: 2px;
+    height: 6px;
+    background: #1a0000;
+    border-radius: 3px;
     overflow: hidden;
     margin-bottom: 10px;
+    border: 1px solid #ff0000;
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #00ff00, #00ffff);
+    background: linear-gradient(90deg, #ff0000, #8b0000);
     width: 0%;
     transition: width 0.1s ease;
+    box-shadow: 0 0 10px #ff0000;
 }
 
 .time-display {
     display: flex;
     justify-content: space-between;
     font-size: 0.9rem;
-    color: #666;
+    color: #cccccc;
 }
 
 .back-btn {
@@ -469,7 +524,8 @@ body {
 .video-container video {
     max-width: 90%;
     max-height: 90%;
-    border: 2px solid #00ff00;
+    border: 3px solid #ff0000;
+    box-shadow: 0 0 30px rgba(255,0,0,0.5);
 }
 
 .close-video {
@@ -477,20 +533,21 @@ body {
     top: 20px;
     right: 20px;
     background: transparent;
-    border: none;
-    color: #00ff00;
+    border: 2px solid #ff0000;
+    color: #ff0000;
     font-size: 2rem;
     cursor: pointer;
     width: 50px;
     height: 50px;
-    border: 1px solid #00ff00;
     border-radius: 50%;
     transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(255,0,0,0.3);
 }
 
 .close-video:hover {
-    background: #00ff00;
+    background: #ff0000;
     color: #000;
+    box-shadow: 0 0 20px #ff0000;
 }
 
 /* Responsive Design */
@@ -547,39 +604,91 @@ body {
 }
 
 .songs-grid::-webkit-scrollbar-track {
-    background: #1a1a1a;
+    background: #1a0000;
 }
 
 .songs-grid::-webkit-scrollbar-thumb {
-    background: #00ff00;
+    background: #ff0000;
     border-radius: 4px;
+    box-shadow: 0 0 5px #ff0000;
 }
 
 .songs-grid::-webkit-scrollbar-thumb:hover {
-    background: #00ffff;
+    background: #8b0000;
 }
 
-/* Particle Effects */
+/* Thrash Metal Particle Effects */
 .particle {
     position: absolute;
-    background: #00ff00;
+    background: #ff0000;
     border-radius: 50%;
     pointer-events: none;
-    animation: particle-fade 1s ease-out forwards;
+    animation: thrash-particle-fade 1.5s ease-out forwards;
+    box-shadow: 0 0 10px #ff0000;
 }
 
-@keyframes particle-fade {
+@keyframes thrash-particle-fade {
     0% {
         opacity: 1;
-        transform: scale(1);
+        transform: scale(1) rotate(0deg);
     }
     100% {
         opacity: 0;
-        transform: scale(0);
+        transform: scale(0) rotate(360deg);
     }
 }
 
-/* Glitch Overlay */
+/* Blood Drip Effect */
+.blood-drip {
+    position: relative;
+    overflow: hidden;
+}
+
+.blood-drip::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, #ff0000, #8b0000);
+    animation: blood-drip-animation 2s ease-in-out infinite;
+}
+
+@keyframes blood-drip-animation {
+    0% { top: -100%; opacity: 0; }
+    50% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+
+/* Skull Burst Effect */
+.skull-burst {
+    position: relative;
+}
+
+.skull-burst::before {
+    content: '💀';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    animation: skull-burst-animation 0.5s ease-out;
+    pointer-events: none;
+}
+
+@keyframes skull-burst-animation {
+    0% { 
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Glitch Overlay - Thrash Style */
 .glitch-overlay {
     position: fixed;
     top: 0;
@@ -605,14 +714,14 @@ body {
     height: 100%;
     background: linear-gradient(90deg, 
         transparent 0%, 
-        rgba(255,0,0,0.1) 25%, 
+        rgba(255,0,0,0.2) 25%, 
         transparent 50%, 
-        rgba(0,0,255,0.1) 75%, 
+        rgba(255,0,0,0.2) 75%, 
         transparent 100%);
-    animation: glitch-scan 0.1s ease;
+    animation: thrash-glitch-scan 0.1s ease;
 }
 
-@keyframes glitch-scan {
+@keyframes thrash-glitch-scan {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
 } 

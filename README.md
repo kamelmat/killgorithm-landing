@@ -1,40 +1,40 @@
 # KILLGORITHM - Thrash Metal Immersive Web Experience
 
-An immersive, interactive web experience for the thrash metal band "Killgorithm" featuring stunning animated backgrounds, dynamic visual effects, and seamless audio playback.
+An immersive, interactive web experience for the thrash metal band "Killgorithm" featuring stunning 3D animated avatars, dynamic visual effects, and seamless audio playback.
 
 ## 🎵 Features
 
 ### Audio & Music
 - **Background Audio Playback**: Music continues playing when browser is minimized
 - **Crossfade Transitions**: Smooth transitions between songs
-- **Audio Effects**: Reverb, distortion, and filter effects
+- **Clean Audio**: Pristine audio quality without unwanted effects
 - **Volume Control**: Dynamic volume management
 - **Playlist Management**: Full playlist support with next/previous controls
 
 ### Visual Experience
-- **Three.js Backgrounds**: Dynamic 3D backgrounds with shaders
-- **Particle Systems**: Multiple particle effects (cyberpunk, matrix, fire, space)
-- **Glitch Effects**: Authentic glitch art and scanline effects
-- **Parallax Movement**: Responsive camera movement
-- **Theme Switching**: Different visual themes per song
+- **3D Animated Avatars**: Each song has its own unique 3D entity
+- **React Three Fiber**: Modern 3D graphics with WebGL acceleration
+- **Interactive Avatars**: Hover effects, animations, and visual feedback
+- **Thrash Metal Aesthetics**: Dark, aggressive, cyberpunk-inspired design
+- **Dynamic Lighting**: Real-time lighting effects and shadows
+
+### Song Avatars
+- **"Nemo's Tears"** → Cyberpunk submarine with thrusters and sonar pings
+- **"Courage Mix"** → Cyborg with glowing human heart and breathing effects
+- **"Ave De Presa"** → Metallic hawk with laser eyes and wing animations
+- **"To Hell & Back To Hell"** → Glitchy demonic bat with fire trails
 
 ### Interactive Elements
-- **Custom Cursor**: Cyberpunk-styled cursor with trails
-- **Hover Effects**: Interactive feedback on all elements
+- **3D Scene Interaction**: Click and hover on avatars
 - **Keyboard Shortcuts**: Full keyboard navigation
 - **Touch Support**: Mobile-friendly touch controls
-- **Video Integration**: Full-screen video playback
-
-### Responsive Design
-- **Mobile Optimized**: Works on all screen sizes
-- **Performance Monitoring**: Automatic effect adjustment based on FPS
-- **Progressive Loading**: Asset preloading with progress indicators
+- **Responsive Design**: Works on all screen sizes
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+- Node.js 16+ 
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- Local web server (for audio/video file access)
 
 ### Installation
 
@@ -44,60 +44,62 @@ An immersive, interactive web experience for the thrash metal band "Killgorithm"
    cd KILLGORITHM
    ```
 
-2. **Add your audio files**
-   - Place `.mp3` files in the `/audio` folder
-   - Update `js/config.js` with your song metadata
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-3. **Add video files (optional)**
-   - Place `.mp4` files in the `/videos` folder
-   - Update song configs with video file paths
+3. **Add your audio files**
+   - Place `.mp3` files in the `/public/audio` folder
+   - Update `src/config/config.js` with your song metadata
 
 4. **Add background images (optional)**
-   - Place images in the `/backgrounds` folder
+   - Place images in the `/public/backgrounds` folder
    - Update song configs with background file paths
 
-5. **Start a local server**
+5. **Start development server**
    ```bash
-   # Using Python
-   python -m http.server 8000
-   
-   # Using Node.js
-   npx serve .
-   
-   # Using PHP
-   php -S localhost:8000
+   npm run dev
    ```
 
 6. **Open in browser**
    ```
-   http://localhost:8000
+   http://localhost:3000
    ```
 
 ## 📁 Project Structure
 
 ```
 KILLGORITHM/
-├── index.html              # Main HTML file
-├── css/
-│   └── style.css           # Main stylesheet
-├── js/
-│   ├── config.js           # Configuration and song metadata
-│   ├── audio-manager.js    # Audio playback management
-│   ├── visual-effects.js   # Particle systems and effects
-│   ├── background-engine.js # Three.js background engine
-│   ├── ui-manager.js       # UI and navigation management
-│   └── app.js              # Main application logic
-├── audio/                  # Audio files (.mp3)
-├── videos/                 # Video files (.mp4)
-├── backgrounds/            # Background images
-└── config/                 # Additional configuration files
+├── src/
+│   ├── components/
+│   │   ├── Experience.jsx      # 3D scene management
+│   │   └── UI.jsx              # User interface
+│   ├── avatars/
+│   │   ├── NemoTears.jsx       # Submarine avatar
+│   │   ├── Courage.jsx         # Cyborg avatar
+│   │   ├── AveDePresa.jsx      # Hawk avatar
+│   │   └── ToHellAndBack.jsx   # Bat avatar
+│   ├── hooks/
+│   │   └── useAudioManager.js  # Audio management
+│   ├── config/
+│   │   └── config.js           # Song configuration
+│   ├── App.jsx                 # Main application
+│   ├── main.jsx                # React entry point
+│   └── index.css               # Base styles
+├── public/
+│   ├── audio/                  # Audio files (.mp3)
+│   └── backgrounds/            # Background images
+├── index.html                  # HTML template
+├── package.json                # Dependencies
+└── vite.config.js              # Build configuration
 ```
 
 ## 🎛️ Configuration
 
 ### Adding New Songs
 
-Edit `js/config.js` to add new songs:
+Edit `src/config/config.js` to add new songs:
 
 ```javascript
 {
@@ -105,98 +107,98 @@ Edit `js/config.js` to add new songs:
     title: "Your Song Title",
     artist: "KILLGORITHM",
     duration: "4:30",
-    audioFile: "audio/your-song.mp3",
-    videoFile: "videos/your-video.mp4", // optional
-    background: "backgrounds/your-bg.jpg", // optional
-    visualStyle: "cyberpunk", // cyberpunk, matrix, apocalyptic, cosmic
-    animationType: "particle-system", // particle-system, matrix-rain, fire-particles, space-particles
+    audioFile: "/audio/your-song.mp3",
+    avatar: "YourAvatar", // Must match component name
+    visualStyle: "thrash-aggressive",
     colorScheme: {
-        primary: "#00ff00",
-        secondary: "#00ffff",
-        accent: "#ff0080"
+        primary: "#ff0000",
+        secondary: "#000000",
+        accent: "#ffffff"
     },
-    effects: ["glitch", "scanlines", "distortion"],
+    effects: ["your", "effects"],
     bpm: 140,
     intensity: 0.8
 }
 ```
 
-### Visual Themes
+### Creating New Avatars
 
-Available themes:
-- **Cyberpunk**: Neon green/cyan with glitch effects
-- **Matrix**: Green matrix rain with data streams
-- **Apocalyptic**: Orange/red fire and smoke effects
-- **Cosmic**: Blue/purple space and star effects
+1. Create a new component in `src/avatars/`
+2. Follow the pattern of existing avatars
+3. Use React Three Fiber hooks (`useFrame`, `useRef`)
+4. Add to the avatar mapping in `src/components/Experience.jsx`
 
-### Audio Effects
+Example avatar structure:
+```jsx
+import React, { useRef, useState } from 'react'
+import { useFrame } from '@react-three/fiber'
 
-Available audio effects:
-- **Reverb**: Echo and space effects
-- **Distortion**: Overdrive and fuzz effects
-- **Filter**: Low-pass and high-pass filtering
+function YourAvatar({ isPlaying, songData }) {
+  const avatarRef = useRef()
+  const [hovered, setHovered] = useState(false)
+  
+  useFrame((state, delta) => {
+    // Animation logic here
+  })
+  
+  return (
+    <group ref={avatarRef}>
+      {/* 3D geometry here */}
+    </group>
+  )
+}
+
+export default YourAvatar
+```
 
 ## 🎮 Controls
 
 ### Keyboard Shortcuts
 - `Space`: Play/Pause
-- `←`: Previous song
-- `→`: Next song
-- `V`: Toggle video (if available)
-- `Esc`: Close video
+- `Esc`: Close modals
+- `Tab`: Navigate UI elements
 
 ### Mouse/Touch
 - Click song cards to play
-- Hover for visual previews
-- Swipe left/right on mobile for song navigation
+- Hover over avatars for effects
+- Click and drag to rotate camera (disabled in current setup)
 
 ## 🎨 Customization
 
-### Visual Effects
-Modify `CONFIG.visual` in `config.js`:
-```javascript
-visual: {
-    particleCount: 100,
-    glitchIntensity: 0.3,
-    backgroundParallax: true,
-    cursorTrails: true,
-    maxTrails: 10
-}
-```
+### Visual Themes
+Available themes in `config.js`:
+- **thrash-aggressive**: Red/black with skulls and blood
+- **thrash-dark**: Black/red with chains and metal
+- **thrash-brutal**: Dark red with bones and aggression
+- **thrash-infernal**: Red/orange with fire and demons
 
-### Performance Settings
-Adjust `CONFIG.performance`:
-```javascript
-performance: {
-    maxParticles: 500,
-    maxAudioSources: 5,
-    enableWebGL: true,
-    enableAudioContext: true,
-    lazyLoading: true,
-    compression: true
-}
-```
+### Avatar Animations
+Each avatar supports:
+- Idle animations (floating, breathing, etc.)
+- Hover effects (rotation, glow, etc.)
+- Playing state animations (intensified effects)
+- Song-specific behaviors
 
 ## 🔧 Technical Details
 
 ### Technologies Used
-- **Three.js**: 3D graphics and shaders
-- **Web Audio API**: Advanced audio processing
-- **GSAP**: Smooth animations and transitions
+- **React 18**: Modern React with hooks
+- **React Three Fiber**: React renderer for Three.js
+- **Three.js**: 3D graphics library
+- **Vite**: Fast build tool and dev server
 - **WebGL**: Hardware-accelerated graphics
-- **CSS3**: Modern styling and effects
+
+### Performance Features
+- **GPU Acceleration**: WebGL rendering
+- **Optimized Avatars**: Low-poly geometry with effects
+- **Frame Rate Monitoring**: Automatic effect adjustment
+- **Memory Management**: Proper cleanup and disposal
 
 ### Browser Compatibility
 - Chrome 80+
 - Firefox 75+
 - Safari 13+
 - Edge 80+
-
-### Performance Features
-- **GPU Acceleration**: WebGL rendering
-- **Lazy Loading**: Assets loaded on demand
-- **Frame Rate Monitoring**: Automatic effect adjustment
-- **Memory Management**: Proper cleanup and disposal
 
 ## 🐛 Troubleshooting
 
@@ -207,23 +209,23 @@ performance: {
 - Check browser autoplay policies
 - Verify audio file paths and formats
 
-**Visual effects not working:**
+**3D not rendering:**
 - Check WebGL support in browser
-- Reduce particle count for better performance
+- Reduce avatar complexity for better performance
 - Disable effects on low-end devices
 
-**Video not loading:**
-- Verify video file paths
-- Check video format compatibility
-- Ensure proper CORS headers
+**Build errors:**
+- Ensure Node.js version is 16+
+- Clear node_modules and reinstall
+- Check for missing dependencies
 
 ### Performance Optimization
 
 For better performance on low-end devices:
-1. Reduce `particleCount` in config
-2. Disable `backgroundParallax`
-3. Set `glitchIntensity` to 0.1
-4. Use compressed audio/video files
+1. Reduce avatar complexity
+2. Disable shadows and effects
+3. Lower resolution
+4. Use compressed audio files
 
 ## 📱 Mobile Support
 
@@ -231,7 +233,6 @@ The experience is fully optimized for mobile devices:
 - Touch-friendly controls
 - Responsive design
 - Optimized performance
-- Swipe gestures
 - Mobile-optimized effects
 
 ## 🎵 Audio File Requirements
@@ -242,13 +243,12 @@ The experience is fully optimized for mobile devices:
 - **Channels**: Stereo
 - **Duration**: Any length supported
 
-## 🎬 Video File Requirements
+## 🎬 Background Image Requirements
 
-- **Format**: MP4 (H.264)
-- **Resolution**: 1080p or lower for performance
-- **Codec**: H.264
-- **Audio**: AAC or MP3
-- **Duration**: Any length supported
+- **Format**: JPG, PNG, or WebP
+- **Resolution**: 1920x1080 or higher
+- **File Size**: Optimize for web (under 2MB recommended)
+- **Aspect Ratio**: 16:9 or similar
 
 ## 🤝 Contributing
 
@@ -264,8 +264,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🎵 About KILLGORITHM
 
-KILLGORITHM is a thrash metal band pushing the boundaries of digital music and visual art. This web experience represents their fusion of aggressive music with cutting-edge technology.
+KILLGORITHM is a thrash metal band pushing the boundaries of digital music and visual art. This web experience represents their fusion of aggressive music with cutting-edge 3D technology.
 
 ---
 
-**Experience the future of metal music visualization.** 
+**Experience the future of metal music visualization with 3D avatars.** 🤘💀🔥 
