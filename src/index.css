@@ -15,6 +15,30 @@ body {
     radial-gradient(circle at 80% 20%, rgba(255,0,0,0.1) 0%, transparent 50%);
 }
 
+/* Enable right-click for debugging */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Enable right-click context menu */
+body {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
+/* Remove any right-click blocking */
+* {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
 #root {
   width: 100vw;
   height: 100vh;

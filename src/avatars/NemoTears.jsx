@@ -1,197 +1,221 @@
 import React, { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 
 function NemoTears({ isPlaying, songData, isCurrentSong, onClick }) {
-  const submarineRef = useRef()
+  const nautilusRef = useRef()
   const [hovered, setHovered] = useState(false)
-  const [sonarPing, setSonarPing] = useState(0)
-  const animationState = useRef({ time: 0, sonarTime: 0, thrusterIntensity: 0 })
-
+  
+  // Load the GLB model
+  const { nodes, materials } = useGLTF('/blender/nautilus_views/nautilus.glb')
+  
   useFrame((state, delta) => {
-    if (!submarineRef.current) return
-
+    if (!nautilusRef.current) return
+    
     const time = state.clock.elapsedTime
-    animationState.current.time = time
-
-    // Idle floating animation
-    submarineRef.current.position.y = Math.sin(time * 0.5) * 0.3
-    submarineRef.current.rotation.z = Math.sin(time * 0.3) * 0.1
-
-    // Forward movement
-    submarineRef.current.position.x += Math.sin(time * 0.2) * 0.01
-
-    // Sonar ping effect
-    animationState.current.sonarTime += delta
-    if (animationState.current.sonarTime > 3) {
-      setSonarPing(1)
-      animationState.current.sonarTime = 0
-    }
-    if (sonarPing > 0) {
-      setSonarPing(prev => Math.max(0, prev - delta * 2))
-    }
-
-    // Thruster intensity based on playing state
-    if (isPlaying) {
-      animationState.current.thrusterIntensity = Math.min(1, animationState.current.thrusterIntensity + delta * 2)
-    } else {
-      animationState.current.thrusterIntensity = Math.max(0.2, animationState.current.thrusterIntensity - delta)
-    }
-
+    
+    // ACTUAL TRAVEL MOVEMENT - The Nautilus moves through 3D space
+    
+    // Create a complex 3D path for the Nautilus to follow
+    const pathRadius = 8
+    const pathHeight = 3
+    const pathSpeed = 0.3
+    
+    // Primary circular path with height variation
+    const x = Math.sin(time * pathSpeed) * pathRadius
+    const y = Math.sin(time * pathSpeed * 0.7) * pathHeight
+    const z = Math.cos(time * pathSpeed) * pathRadius - 5
+    
+    // Set position - this is actual movement through space
+    nautilusRef.current.position.set(x, y, z)
+    
+    // Calculate the direction of travel for proper orientation
+    const nextX = Math.sin((time + 0.1) * pathSpeed) * pathRadius
+    const nextY = Math.sin((time + 0.1) * pathSpeed * 0.7) * pathHeight
+    const nextZ = Math.cos((time + 0.1) * pathSpeed) * pathRadius - 5
+    
+    // Point the Nautilus in the direction it's traveling
+    const direction = new THREE.Vector3(nextX - x, nextY - y, nextZ - z)
+    direction.normalize()
+    
+    // Create a rotation matrix to orient the Nautilus
+    const up = new THREE.Vector3(0, 1, 0)
+    const right = new THREE.Vector3().crossVectors(direction, up).normalize()
+    const correctedUp = new THREE.Vector3().crossVectors(right, direction).normalize()
+    
+    const rotationMatrix = new THREE.Matrix4()
+    rotationMatrix.makeBasis(right, correctedUp, direction)
+    
+    // Apply the rotation
+    nautilusRef.current.quaternion.setFromRotationMatrix(rotationMatrix)
+    
+    // Add subtle banking when turning
+    const turnIntensity = Math.abs(Math.sin(time * pathSpeed)) * 0.3
+    nautilusRef.current.rotateZ(turnIntensity * 0.1)
+    
+    // Size changes based on distance from center (depth perception)
+    const distanceFromCenter = Math.sqrt(x * x + z * z)
+    const depthScale = 1 + (distanceFromCenter / pathRadius) * 0.3
+    nautilusRef.current.scale.setScalar(depthScale)
+    
     // Hover effect
     if (hovered) {
-      submarineRef.current.scale.setScalar(1.1)
-      submarineRef.current.rotation.y = Math.sin(time * 2) * 0.2
-    } else {
-      submarineRef.current.scale.setScalar(1)
-      submarineRef.current.rotation.y = 0
+      nautilusRef.current.scale.multiplyScalar(1.1)
     }
   })
-
+  
   const handleClick = () => {
     if (onClick) {
       onClick()
     }
   }
-
+  
   const handlePointerOver = () => {
     setHovered(true)
     document.body.style.cursor = 'pointer'
   }
-
+  
   const handlePointerOut = () => {
     setHovered(false)
     document.body.style.cursor = 'default'
   }
-
+  
   return (
     <group 
-      ref={submarineRef} 
+      ref={nautilusRef} 
       position={[0, 0, -5]}
       onClick={handleClick}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
     >
-      {/* Main Submarine Body */}
-      <mesh position={[0, 0, 0]}>
-        <capsuleGeometry args={[0.8, 3, 8, 16]} />
-        <meshStandardMaterial 
-          color={isCurrentSong ? "#00ffff" : "#444444"}
-          metalness={0.8}
-          roughness={0.2}
-          emissive={isCurrentSong ? "#00ffff" : "#000000"}
-          emissiveIntensity={isCurrentSong ? 0.3 : 0}
-        />
-      </mesh>
-
-      {/* Nose Cone */}
-      <mesh position={[0, 0, 1.8]}>
-        <coneGeometry args={[0.8, 1, 8]} />
-        <meshStandardMaterial 
-          color={isCurrentSong ? "#00ffff" : "#666666"}
-          metalness={0.9}
-          roughness={0.1}
-        />
-      </mesh>
-
-      {/* Tail */}
-      <mesh position={[0, 0, -1.8]}>
-        <cylinderGeometry args={[0.3, 0.8, 1, 8]} />
-        <meshStandardMaterial 
-          color={isCurrentSong ? "#00ffff" : "#555555"}
-          metalness={0.8}
-          roughness={0.2}
-        />
-      </mesh>
-
-      {/* Thrusters */}
-      <ThrusterExhaust 
-        position={[0.3, 0, -2.2]} 
-        intensity={animationState.current.thrusterIntensity}
-        isPlaying={isPlaying}
-      />
-      <ThrusterExhaust 
-        position={[-0.3, 0, -2.2]} 
-        intensity={animationState.current.thrusterIntensity}
-        isPlaying={isPlaying}
-      />
-
-      {/* Glowing Eyes */}
-      <mesh position={[0.2, 0.3, 1.2]}>
-        <sphereGeometry args={[0.1, 8, 8]} />
-        <meshStandardMaterial 
-          color={hovered || isCurrentSong ? "#ff0000" : "#00ffff"}
-          emissive={hovered || isCurrentSong ? "#ff0000" : "#00ffff"}
-          emissiveIntensity={hovered ? 1 : (isCurrentSong ? 0.5 : 0.2)}
-        />
-      </mesh>
-      <mesh position={[-0.2, 0.3, 1.2]}>
-        <sphereGeometry args={[0.1, 8, 8]} />
-        <meshStandardMaterial 
-          color={hovered || isCurrentSong ? "#ff0000" : "#00ffff"}
-          emissive={hovered || isCurrentSong ? "#ff0000" : "#00ffff"}
-          emissiveIntensity={hovered ? 1 : (isCurrentSong ? 0.5 : 0.2)}
-        />
-      </mesh>
-
-      {/* Sonar Ping */}
-      {sonarPing > 0 && (
-        <SonarPing position={[0, 0, 1.8]} intensity={sonarPing} />
-      )}
-
+      {/* 3D NAUTILUS MODEL from GLB - Preserve original materials */}
+      <group>
+        {/* Render all meshes from the GLB with original materials */}
+        {Object.keys(nodes).map((nodeName) => {
+          const node = nodes[nodeName]
+          if (node.isMesh) {
+            return (
+              <mesh
+                key={nodeName}
+                geometry={node.geometry}
+                position={node.position}
+                rotation={node.rotation}
+                scale={node.scale}
+                material={node.material} // Use original material to preserve textures
+              />
+            )
+          }
+          return null
+        })}
+      </group>
+      
+      {/* Subtle lighting that doesn't overpower textures */}
+      <NautilusLighting isCurrentSong={isCurrentSong} isPlaying={isPlaying} />
+      
       {/* Clickable area */}
       <mesh position={[0, 0, 0]} visible={false}>
-        <sphereGeometry args={[2, 8, 8]} />
+        <sphereGeometry args={[3, 16, 16]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
     </group>
   )
 }
 
-function ThrusterExhaust({ position, intensity, isPlaying }) {
-  const exhaustRef = useRef()
+// Subtle Lighting Component that preserves textures
+function NautilusLighting({ isCurrentSong, isPlaying }) {
+  const lightsRef = useRef()
   
   useFrame((state) => {
-    if (exhaustRef.current) {
-      const time = state.clock.elapsedTime
-      exhaustRef.current.scale.setScalar(intensity * (0.5 + Math.sin(time * 10) * 0.2))
+    const time = state.clock.elapsedTime
+    
+    if (lightsRef.current) {
+      // Very subtle light animation
+      lightsRef.current.children.forEach((light, index) => {
+        if (light.isPointLight) {
+          light.intensity = isCurrentSong ? 
+            (0.3 + Math.sin(time * 1 + index) * 0.1) : 0.2
+        }
+      })
     }
   })
-
-  return (
-    <mesh ref={exhaustRef} position={position}>
-      <cylinderGeometry args={[0.1, 0.2, 0.5, 8]} />
-      <meshStandardMaterial 
-        color={isPlaying ? "#ff6600" : "#666666"}
-        emissive={isPlaying ? "#ff6600" : "#000000"}
-        emissiveIntensity={isPlaying ? intensity : 0}
-        transparent
-        opacity={0.8}
-      />
-    </mesh>
-  )
-}
-
-function SonarPing({ position, intensity }) {
-  const pingRef = useRef()
   
-  useFrame(() => {
-    if (pingRef.current) {
-      pingRef.current.scale.setScalar(1 + intensity * 3)
-      pingRef.current.material.opacity = intensity * 0.5
-    }
-  })
-
   return (
-    <mesh ref={pingRef} position={position}>
-      <sphereGeometry args={[0.5, 16, 16]} />
-      <meshBasicMaterial 
-        color="#00ffff"
-        transparent
-        opacity={0.3}
-        side={THREE.DoubleSide}
+    <group ref={lightsRef}>
+      {/* Very subtle ambient lighting - preserve original textures */}
+      <pointLight
+        position={[0, 0, 3]}
+        intensity={isCurrentSong ? 0.4 : 0.2}
+        color={isCurrentSong ? "#00ffff" : "#ffffff"}
+        distance={10}
+        decay={3}
       />
-    </mesh>
+      
+      {/* Top light - very subtle */}
+      <pointLight
+        position={[0, 2, 0]}
+        intensity={isCurrentSong ? 0.3 : 0.15}
+        color={isCurrentSong ? "#00ffff" : "#ffffff"}
+        distance={8}
+        decay={3}
+      />
+      
+      {/* Bottom light - very subtle */}
+      <pointLight
+        position={[0, -2, 0]}
+        intensity={isCurrentSong ? 0.2 : 0.1}
+        color={isCurrentSong ? "#00ffff" : "#ffffff"}
+        distance={8}
+        decay={3}
+      />
+      
+      {/* Left side light - very subtle */}
+      <pointLight
+        position={[-2, 0, 0]}
+        intensity={isCurrentSong ? 0.25 : 0.12}
+        color={isCurrentSong ? "#00ffff" : "#ffffff"}
+        distance={8}
+        decay={3}
+      />
+      
+      {/* Right side light - very subtle */}
+      <pointLight
+        position={[2, 0, 0]}
+        intensity={isCurrentSong ? 0.25 : 0.12}
+        color={isCurrentSong ? "#00ffff" : "#ffffff"}
+        distance={8}
+        decay={3}
+      />
+      
+      {/* Back light - very subtle */}
+      <pointLight
+        position={[0, 0, -3]}
+        intensity={isCurrentSong ? 0.2 : 0.1}
+        color={isCurrentSong ? "#00ffff" : "#ffffff"}
+        distance={8}
+        decay={3}
+      />
+      
+      {/* Thruster lights when playing - more visible */}
+      {isPlaying && (
+        <>
+          <pointLight
+            position={[-0.8, 0, -3]}
+            intensity={0.8}
+            color="#ff6600"
+            distance={6}
+            decay={2}
+          />
+          <pointLight
+            position={[0.8, 0, -3]}
+            intensity={0.8}
+            color="#ff6600"
+            distance={6}
+            decay={2}
+          />
+        </>
+      )}
+    </group>
   )
 }
 
