@@ -15,7 +15,9 @@ const CONFIG = {
         crossfade: true,
         crossfadeDuration: 2000,
         preloadNext: true,
-        backgroundPlayback: true
+        backgroundPlayback: true,
+        cleanMode: true, // Ensures pristine audio quality
+        disableEffects: true // Disables all audio effects for clean sound
     },
 
     // Visual Settings
@@ -30,13 +32,13 @@ const CONFIG = {
     // Songs Configuration
     songs: [
         {
-            id: "digital-void",
-            title: "Digital Void",
+            id: "nemos-tears",
+            title: "Nemo's Tears",
             artist: "KILLGORITHM",
-            duration: "4:32",
-            audioFile: "audio/digital-void.mp3",
-            videoFile: "videos/digital-void.mp4",
-            background: "backgrounds/cyber-void.jpg",
+            duration: "6:57",
+            audioFile: "audio/nemos-tears.mp3",
+            videoFile: "",
+            background: "backgrounds/killgorithm.png",
             visualStyle: "cyberpunk",
             animationType: "particle-system",
             colorScheme: {
@@ -44,18 +46,18 @@ const CONFIG = {
                 secondary: "#00ffff",
                 accent: "#ff0080"
             },
-            effects: ["glitch", "scanlines", "distortion"],
+            effects: ["glitch", "scanlines"],
             bpm: 140,
             intensity: 0.8
         },
         {
-            id: "neural-overload",
-            title: "Neural Overload",
+            id: "courage-mix",
+            title: "Courage Mix",
             artist: "KILLGORITHM",
-            duration: "3:45",
-            audioFile: "audio/neural-overload.mp3",
-            videoFile: "videos/neural-overload.mp4",
-            background: "backgrounds/neural-grid.jpg",
+            duration: "4:30",
+            audioFile: "audio/COURAGE MIX AUG 24.mp3",
+            videoFile: "",
+            background: "backgrounds/killgorithm.png",
             visualStyle: "matrix",
             animationType: "matrix-rain",
             colorScheme: {
@@ -63,56 +65,37 @@ const CONFIG = {
                 secondary: "#ffffff",
                 accent: "#ff0000"
             },
-            effects: ["matrix", "data-stream", "glitch"],
+            effects: ["matrix", "data-stream"],
             bpm: 160,
             intensity: 0.9
         },
         {
-            id: "apocalyptic-rise",
-            title: "Apocalyptic Rise",
+            id: "ave-de-presa",
+            title: "Ave De Presa",
             artist: "KILLGORITHM",
-            duration: "5:18",
-            audioFile: "audio/apocalyptic-rise.mp3",
-            videoFile: "videos/apocalyptic-rise.mp4",
-            background: "backgrounds/wasteland.jpg",
-            visualStyle: "post-apocalyptic",
+            duration: "5:45",
+            audioFile: "audio/AVE DE PRESA v10.mp3",
+            videoFile: "",
+            background: "backgrounds/killgorithm.png",
+            visualStyle: "apocalyptic",
             animationType: "fire-particles",
             colorScheme: {
                 primary: "#ff6600",
                 secondary: "#ff0000",
                 accent: "#ffff00"
             },
-            effects: ["fire", "smoke", "explosions"],
+            effects: ["fire", "smoke"],
             bpm: 180,
             intensity: 1.0
         },
         {
-            id: "cyber-assault",
-            title: "Cyber Assault",
+            id: "to-hell-and-back",
+            title: "To Hell & Back To Hell",
             artist: "KILLGORITHM",
-            duration: "4:15",
-            audioFile: "audio/cyber-assault.mp3",
-            videoFile: "videos/cyber-assault.mp4",
-            background: "backgrounds/cyber-city.jpg",
-            visualStyle: "cyberpunk",
-            animationType: "city-grid",
-            colorScheme: {
-                primary: "#00ffff",
-                secondary: "#ff00ff",
-                accent: "#ffff00"
-            },
-            effects: ["neon", "hologram", "electricity"],
-            bpm: 150,
-            intensity: 0.85
-        },
-        {
-            id: "void-walker",
-            title: "Void Walker",
-            artist: "KILLGORITHM",
-            duration: "6:22",
-            audioFile: "audio/void-walker.mp3",
-            videoFile: "videos/void-walker.mp4",
-            background: "backgrounds/void-space.jpg",
+            duration: "7:20",
+            audioFile: "audio/To Hell & Back To Hel v8.mp3",
+            videoFile: "",
+            background: "backgrounds/killgorithm.png",
             visualStyle: "cosmic",
             animationType: "space-particles",
             colorScheme: {
@@ -120,9 +103,9 @@ const CONFIG = {
                 secondary: "#ffffff",
                 accent: "#ff00ff"
             },
-            effects: ["nebula", "stars", "wormhole"],
-            bpm: 120,
-            intensity: 0.7
+            effects: ["nebula", "stars"],
+            bpm: 150,
+            intensity: 0.85
         }
     ],
 

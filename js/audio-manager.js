@@ -16,7 +16,7 @@ class AudioManager {
 
     async initializeAudio() {
         try {
-            // Initialize Web Audio API
+            // Initialize Web Audio API (for clean playback only)
             if (window.AudioContext || window.webkitAudioContext) {
                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
@@ -24,10 +24,14 @@ class AudioManager {
             // Set initial volume
             this.audioPlayer.volume = this.volume;
             
+            // Ensure clean audio settings
+            this.audioPlayer.preload = 'auto';
+            this.audioPlayer.crossOrigin = 'anonymous';
+            
             // Load playlist from config
             this.playlist = CONFIG.songs;
             
-            console.log('Audio Manager initialized successfully');
+            console.log('Audio Manager initialized successfully - Clean audio mode');
         } catch (error) {
             console.error('Failed to initialize audio:', error);
         }
@@ -104,8 +108,8 @@ class AudioManager {
                 this.isPlaying = true;
                 this.updatePlayButton();
                 
-                // Trigger visual effects
-                this.triggerVisualEffects();
+                // Trigger visual effects only (no audio effects)
+                this.triggerVisualEffectsOnly();
                 
                 console.log('Playing:', this.currentSong?.title);
             }
@@ -267,8 +271,8 @@ class AudioManager {
         return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
     }
 
-    triggerVisualEffects() {
-        // Trigger glitch effect
+    triggerVisualEffectsOnly() {
+        // Trigger glitch effect (visual only)
         const glitchOverlay = document.querySelector('.glitch-overlay');
         if (glitchOverlay) {
             glitchOverlay.classList.add('active');

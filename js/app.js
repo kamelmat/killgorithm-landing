@@ -366,10 +366,10 @@ class KillgorithmApp {
         // Trigger visual effects
         this.triggerSongVisualEffects();
         
-        // Apply audio effects
-        if (currentSong.effects && currentSong.effects.includes('distortion')) {
-            window.audioManager.applyAudioEffect('distortion', currentSong.intensity);
-        }
+        // Audio effects disabled for pristine sound quality
+        // if (currentSong.effects && currentSong.effects.includes('distortion')) {
+        //     window.audioManager.applyAudioEffect('distortion', currentSong.intensity);
+        // }
     }
 
     onSongPause() {
