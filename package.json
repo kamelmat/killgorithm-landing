@@ -1,0 +1,49 @@
+{
+  "name": "killgorithm-web-experience",
+  "version": "1.0.0",
+  "description": "Immersive web experience for the thrash metal band KILLGORITHM",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx serve .",
+    "dev": "npx live-server --port=8000 --open=/",
+    "build": "echo 'No build process required - static files only'",
+    "test": "echo 'No tests specified'",
+    "lint": "echo 'No linting configured'"
+  },
+  "keywords": [
+    "music",
+    "metal",
+    "thrash",
+    "web-experience",
+    "threejs",
+    "webgl",
+    "audio",
+    "visualization",
+    "cyberpunk",
+    "interactive"
+  ],
+  "author": "KILLGORITHM",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/killgorithm-web-experience.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/killgorithm-web-experience/issues"
+  },
+  "homepage": "https://github.com/your-username/killgorithm-web-experience#readme",
+  "devDependencies": {
+    "serve": "^14.2.0",
+    "live-server": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "Chrome >= 80",
+    "Firefox >= 75",
+    "Safari >= 13",
+    "Edge >= 80"
+  ]
+} 
