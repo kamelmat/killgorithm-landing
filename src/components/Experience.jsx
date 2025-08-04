@@ -3,72 +3,23 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { CONFIG } from '../config/config'
 import NemoTears from '../avatars/NemoTears'
-import Courage from '../avatars/Courage'
-import AveDePresa from '../avatars/AveDePresa'
-import ToHellAndBack from '../avatars/ToHellAndBack'
 
 const AVATAR_COMPONENTS = { 
-  'NemoTears': NemoTears, 
-  'Courage': Courage, 
-  'AveDePresa': AveDePresa, 
-  'ToHellAndBack': ToHellAndBack 
+  'NemoTears': NemoTears
 }
 
 function Experience({ currentSong, isPlaying, onSongSelect }) {
   const sceneRef = useRef()
-  const [avatarPositions, setAvatarPositions] = useState(() => {
-    // Initialize random positions for all avatars - full 3D space
-    return CONFIG.songs.map(song => ({
-      id: song.id,
-      position: [
-        (Math.random() - 0.5) * 30, // x: -15 to 15 (full width)
-        (Math.random() - 0.5) * 20,  // y: -10 to 10 (full height including behind title)
-        (Math.random() - 0.5) * 20 - 5 // z: -15 to 5 (depth range)
-      ],
-      velocity: [
-        (Math.random() - 0.5) * 0.04, // x velocity (faster)
-        (Math.random() - 0.5) * 0.04, // y velocity (faster)
-        (Math.random() - 0.5) * 0.04  // z velocity (faster)
-      ],
-      rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.04
-    }))
-  })
-
-  // Animate all avatars moving around
-  useFrame((state, delta) => {
-    setAvatarPositions(prev => prev.map(avatar => {
-      const newPosition = [
-        avatar.position[0] + avatar.velocity[0],
-        avatar.position[1] + avatar.velocity[1],
-        avatar.position[2] + avatar.velocity[2]
-      ]
-      
-      // Bounce off boundaries - full 3D space bounds
-      const bounds = { x: 16, y: 12, z: 10 }
-      const newVelocity = [...avatar.velocity]
-      
-      if (Math.abs(newPosition[0]) > bounds.x) {
-        newVelocity[0] *= -1
-        newPosition[0] = Math.sign(newPosition[0]) * bounds.x
+  
+  // Define movement zones for each avatar to prevent overlap
+  const avatarZones = {
+    'NemoTears': {
+      // Submarine: Full 3D space for proper movement
+      xRange: [-50, 50],
+      yRange: [-20, 20],   // Full height range
+      zRange: [-50, 50]    // Full depth range
       }
-      if (Math.abs(newPosition[1]) > bounds.y) {
-        newVelocity[1] *= -1
-        newPosition[1] = Math.sign(newPosition[1]) * bounds.y
-      }
-      if (Math.abs(newPosition[2]) > bounds.z) {
-        newVelocity[2] *= -1
-        newPosition[2] = Math.sign(newPosition[2]) * bounds.z
-      }
-      
-      return {
-        ...avatar,
-        position: newPosition,
-        velocity: newVelocity,
-        rotation: avatar.rotation + avatar.rotationSpeed
-      }
-    }))
-  })
+  }
 
   return (
     <>
@@ -78,19 +29,22 @@ function Experience({ currentSong, isPlaying, onSongSelect }) {
       {/* Dynamic Lighting based on current song */}
       <DynamicLighting currentSong={currentSong} isPlaying={isPlaying} />
       
-      {/* All Avatars - Always Visible */}
+      {/* All Avatars - Each handles its own movement independently */}
       <Suspense fallback={null}>
-        {CONFIG.songs.map((song, index) => {
+        {CONFIG.songs.map((song) => {
           const AvatarComponent = AVATAR_COMPONENTS[song.avatar]
-          const avatarData = avatarPositions[index]
           const isCurrentSong = currentSong === song.id
+          const zone = avatarZones[song.avatar]
+          
+          // Only render if avatar component exists
+          if (!AvatarComponent) {
+            return null
+          }
           
           return (
             <group
               key={song.id}
-              position={avatarData.position}
-              rotation={[0, avatarData.rotation, 0]}
-              // Ensure the group can receive pointer events
+              // No global positioning - each avatar handles its own movement
               onPointerOver={(e) => e.stopPropagation()}
               onPointerOut={(e) => e.stopPropagation()}
             >
@@ -99,6 +53,7 @@ function Experience({ currentSong, isPlaying, onSongSelect }) {
                 songData={song}
                 isCurrentSong={isCurrentSong}
                 onClick={() => onSongSelect(song.id)}
+                movementZone={zone} // Pass zone info for independent movement
               />
             </group>
           )

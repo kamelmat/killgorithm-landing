@@ -3,47 +3,13 @@ import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 
-// ============================================================================
-// CONFIGURABLE MOVEMENT PARAMETERS
-// ============================================================================
-const MOVEMENT_CONFIG = {
-  // Speed settings
-  MOVEMENT_SPEED: 1.5,        // units per second
-  ROTATION_SPEED: 0.5,        // radians per second
-  
-  // Scale settings for depth perception
-  SCALE_NEAR: 1.5,            // size when close to camera
-  SCALE_FAR: 0.4,             // size when far from camera
-  
-  // Starting position and orientation
-  START_POSITION: { x: 0, y: 0, z: -80 },
-  START_ROTATION: { x: 0, y: -Math.PI / 2 - 0.3, z: 0 },
-  START_SCALE: 0.5,
-}
-
-// ============================================================================
-// MOVEMENT INSTRUCTIONS - Define the journey here
-// ============================================================================
-const MOVEMENT_INSTRUCTIONS = [
-  { type: 'diagonal_forward', duration: 8 },
-  { type: 'turn_right', duration: 8, angle: 135 },
-  { type: 'move_forward_and_down', duration: 8 }, // 🔧 FIXED: Increased from 4 to 8 seconds
-  { type: 'continue_diagonal_left', duration: 10 }, // NEW: Continue trajectory with graceful movement
-  // TEMPORARILY COMMENTED OUT TO TEST
-  // { type: 'diagonal_backward', duration: 6 },
-  // { type: 'turn_right_varied', duration: 5 },
-  // { type: 'move_forward', duration: 7 }
-]
-
 function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }) {
   const nautilusRef = useRef()
   const [hovered, setHovered] = useState(false)
   
   const { nodes } = useGLTF('/blender/nautilus_views/nautilus.glb')
 
-  // ============================================================================
-  // SUBMARINE STATE SYSTEM - EXACTLY LIKE NeMock.jsx
-  // ============================================================================
+  // SUBMARINE STATE SYSTEM - Like a video game character
   const submarineState = useRef({
     // Current position and rotation
     position: { x: 0, y: 0, z: -80 }, // Starting position
@@ -51,7 +17,6 @@ function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }
     scale: 0.5, // Starting scale
     
     // Movement state
-    currentInstructionIndex: 0,
     currentState: 'diagonal_forward', // Current movement state
     stateStartTime: 0, // When current state started
     stateDuration: 8, // How long current state lasts
@@ -59,16 +24,8 @@ function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }
     // Movement parameters
     speed: 1.5, // Base movement speed
     turnSpeed: 0.5, // Turn speed multiplier
-    
-    // Store rotation values for cross-state access
-    rightTargetRotation: -Math.PI / 2 - 0.3, // Store turn_right rotation
-    varTargetRotation: -Math.PI / 2 - 0.3, // Store turn_right_varied rotation
   })
 
-  // ============================================================================
-  // MAIN ANIMATION LOOP - EXACTLY LIKE NeMock.jsx
-  // ============================================================================
-  
   useFrame((frameState, delta) => {
     const nautilus = nautilusRef.current
     if (!nautilus) return
@@ -83,30 +40,15 @@ function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }
       submarineStateData.stateStartTime = time
     }
     
-    // Get current instruction
-    const currentInstruction = MOVEMENT_INSTRUCTIONS[submarineStateData.currentInstructionIndex]
-    if (!currentInstruction) {
-      // Journey complete - restart
-      submarineStateData.currentInstructionIndex = 0
-      submarineStateData.stateStartTime = time
-      submarineStateData.currentState = 'diagonal_forward'
-      submarineStateData.position = { x: 0, y: 0, z: -80 }
-      submarineStateData.rotation = { x: 0, y: -Math.PI / 2 - 0.3, z: 0 }
-      submarineStateData.scale = 0.5
-      submarineStateData.rightTargetRotation = -Math.PI / 2 - 0.3
-      submarineStateData.varTargetRotation = -Math.PI / 2 - 0.3
-      return
-    }
-    
     // Calculate state progress
     const stateElapsed = time - submarineStateData.stateStartTime
-    const stateProgress = Math.min(stateElapsed / currentInstruction.duration, 1)
+    const stateProgress = Math.min(stateElapsed / submarineStateData.stateDuration, 1)
     const smoothProgress = stateProgress * stateProgress * (3 - 2 * stateProgress) // Smoothstep
     
     // Execute current state
-    switch (currentInstruction.type) {
+    switch (submarineStateData.currentState) {
       case 'diagonal_forward':
-        // DIAGONAL FORWARD MOVEMENT STATE - EXACTLY LIKE NeMock.jsx
+        // DIAGONAL FORWARD MOVEMENT STATE
         // X-AXIS: Move left (negative X)
         const startX = 0
         const endX = -40 // Move 40 units left
@@ -136,22 +78,19 @@ function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }
         break
         
       case 'turn_right':
-        // GRADUAL TURN RIGHT - EXACTLY LIKE NeMock.jsx
+        // GRADUAL TURN RIGHT - VISIBLE STEP-BY-STEP ROTATION
         // Start from end position of diagonal_forward (NO GLITCH - CONTINUOUS)
-        const turnRightStartX = -40 // 🔧 FIXED: Use actual end position from diagonal_forward
-        const turnRightStartZ = -20 // 🔧 FIXED: Use actual end position from diagonal_forward
-        const turnRightStartScale = 1.0 // 🔧 FIXED: Use actual end scale from diagonal_forward
+        const turnRightStartX = submarineStateData.position.x || -40// 🔧 TWEAK: Starting X position
+        const turnRightStartZ = submarineStateData.position.z || -20 // 🔧 TWEAK: Starting Z position  
+        const turnRightStartScale = submarineStateData.scale || 1.0 // 🔧 TWEAK: Starting scale
         
         // CONSTANT SPEED ROTATION: BIGGER turn (more rotation) - TURNING RIGHT
-        const rightStartRotation = -Math.PI / 2 - 0.3
-        const rightEndRotation = -Math.PI / 2 - 2.2 // BIGGER ending angle + 45° more (larger turn RIGHT)
+        const rightStartRotation = -Math.PI / 2 - 0.3 // 🔧 TWEAK: Starting rotation angle
+        const rightEndRotation = -Math.PI / 2 - 2.2 // 🔧 TWEAK: BIGGER ending angle + 45° more (larger turn RIGHT)
         
         // LINEAR INTERPOLATION for constant speed (no acceleration/deceleration)
         const rightTargetRotation = rightStartRotation + (smoothProgress * (rightEndRotation - rightStartRotation))
         nautilus.rotation.set(0, rightTargetRotation, 0)
-        
-        // Store the rotation for other states to use
-        submarineStateData.rightTargetRotation = rightTargetRotation
         
         // NO MOVEMENT DURING TURN - JUST ROTATION
         // Keep the same position throughout the turn
@@ -165,54 +104,38 @@ function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }
         submarineStateData.position = { x: turnRightStartX, y: 0, z: turnRightStartZ }
         submarineStateData.rotation = { x: 0, y: rightTargetRotation, z: 0 }
         submarineStateData.scale = turnRightStartScale
-        
-        // DEBUG: Log the turn_right end position
-        if (stateProgress === 1) {
-          console.log('🔍 turn_right END:', { x: turnRightStartX, z: turnRightStartZ, scale: turnRightStartScale })
-        }
         break
         
       case 'move_forward_and_down':
-        // MOVE FORWARD AND DOWN STATE - EXACTLY LIKE NeMock.jsx
-        // Start from end position of turn_right (which should be -40, -20, 1.0)
-        const forwardDownStartX = -40 // 🔧 FIXED: Use hardcoded correct position from turn_right
-        const forwardDownStartZ = -20 // 🔧 FIXED: Use hardcoded correct position from turn_right
-        const forwardDownStartScale = 1.0 // 🔧 FIXED: Use hardcoded correct scale from turn_right
-        
-        // DEBUG: Log the starting position
-        if (stateProgress === 0) {
-          console.log('🔍 move_forward_and_down START:', { x: forwardDownStartX, z: forwardDownStartZ, scale: forwardDownStartScale })
-          console.log('🔍 submarineStateData.position:', submarineStateData.position)
-        }
+        // MOVE FORWARD AND DOWN STATE (moving away from viewer)
+        // Start from end position of turn_right
+        const forwardDownStartX = submarineStateData.position.x || -40
+        const forwardDownStartZ = submarineStateData.position.z || -20
+        const forwardDownStartScale = submarineStateData.scale || 1.0
         
         // X-AXIS: Move left (negative X) - maintaining diagonal direction
-        const forwardDownEndX = forwardDownStartX - 5.86 // 🔧 FIXED: 25% more = 4.69 * 1.25 = 5.86 units left
+        const forwardDownEndX = forwardDownStartX - 15 // 🔧 TWEAK: Move 15 units left (diagonal)
         const forwardDownX = forwardDownStartX + (smoothProgress * (forwardDownEndX - forwardDownStartX))
         
         // Z-AXIS: Move away (negative Z) - getting smaller
-        const forwardDownEndZ = forwardDownStartZ - 7.81 // 🔧 FIXED: 25% more = 6.25 * 1.25 = 7.81 units away
+        const forwardDownEndZ = forwardDownStartZ - 20 // 🔧 TWEAK: Move 20 units away
         const forwardDownZ = forwardDownStartZ + (smoothProgress * (forwardDownEndZ - forwardDownStartZ))
         
         // Set position with diagonal movement
         nautilus.position.set(forwardDownX, 0, forwardDownZ)
         
         // ROTATION: Incline nose down 3% (X-axis rotation)
-        const startRotationY = submarineStateData.rightTargetRotation // Keep Y rotation from turn_right
-        const startRotationX = 0 // Starting X rotation (level)
-        const endRotationX = -0.03 // 3% nose down (negative X rotation)
+        const startRotationY = submarineStateData.rotation?.y || -Math.PI / 2 - 2.2 // 🔧 TWEAK: Keep Y rotation from turn_right
+        const startRotationX = 0 // 🔧 TWEAK: Starting X rotation (level)
+        const endRotationX = -0.03 // 🔧 TWEAK: 3% nose down (negative X rotation)
         const currentRotationX = startRotationX + (smoothProgress * (endRotationX - startRotationX))
         
         nautilus.rotation.set(currentRotationX, startRotationY, 0)
         
         // Scale decreases as it gets away (depth perception)
-        const forwardDownEndScale = 0.85 // 🔧 FIXED: Slightly more scale reduction for longer distance
+        const forwardDownEndScale = 0.4 // 🔧 TWEAK: Much smaller when far away
         const forwardDownScale = forwardDownStartScale + (smoothProgress * (forwardDownEndScale - forwardDownStartScale))
         nautilus.scale.setScalar(forwardDownScale)
-        
-        // DEBUG: Log the ending position
-        if (stateProgress === 1) {
-          console.log('🔍 move_forward_and_down END:', { x: forwardDownX, z: forwardDownZ, scale: forwardDownScale })
-        }
         
         // Update state for next transition
         submarineStateData.position = { x: forwardDownX, y: 0, z: forwardDownZ }
@@ -220,104 +143,57 @@ function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }
         submarineStateData.scale = forwardDownScale
         break
         
-      case 'continue_diagonal_left':
-        // CONTINUE DIAGONAL LEFT - NEW MOVEMENT
-        // Start from end position of move_forward_and_down (-45.86, 0, -27.81, scale 0.85)
-        const continueLeftStartX = -45.86 // 🔧 FIXED: Use hardcoded end position from move_forward_and_down
-        const continueLeftStartZ = -27.81 // 🔧 FIXED: Use hardcoded end position from move_forward_and_down
-        const continueLeftStartScale = 0.85 // 🔧 FIXED: Use hardcoded end scale from move_forward_and_down
-        
-        // DEBUG: Log the starting position
-        if (stateProgress === 0) {
-          console.log('🔍 continue_diagonal_left START:', { x: continueLeftStartX, z: continueLeftStartZ, scale: continueLeftStartScale })
-        }
-        
-        // X-AXIS: Continue left (negative X) - maintaining trajectory
-        const continueLeftEndX = continueLeftStartX - 8 // Move 8 units further left
-        const continueLeftX = continueLeftStartX + (smoothProgress * (continueLeftEndX - continueLeftStartX))
-        
-        // Z-AXIS: Continue away (negative Z) - getting smaller
-        const continueLeftEndZ = continueLeftStartZ - 10 // Move 10 units further away
-        const continueLeftZ = continueLeftStartZ + (smoothProgress * (continueLeftEndZ - continueLeftStartZ))
-        
-        // Set position with diagonal movement
-        nautilus.position.set(continueLeftX, 0, continueLeftZ)
-        
-        // ROTATION: Maintain current rotation (nose pointing in trajectory direction)
-        const continueLeftRotationY = submarineStateData.rightTargetRotation // Keep Y rotation from turn_right
-        const continueLeftRotationX = -0.03 // Keep X rotation (nose down) from move_forward_and_down
-        nautilus.rotation.set(continueLeftRotationX, continueLeftRotationY, 0)
-        
-        // Scale decreases as it gets away (depth perception)
-        const continueLeftEndScale = 0.65 // Smaller when further away
-        const continueLeftScale = continueLeftStartScale + (smoothProgress * (continueLeftEndScale - continueLeftStartScale))
-        nautilus.scale.setScalar(continueLeftScale)
-        
-        // DEBUG: Log the ending position
-        if (stateProgress === 1) {
-          console.log('🔍 continue_diagonal_left END:', { x: continueLeftX, z: continueLeftZ, scale: continueLeftScale })
-        }
-        
-        // Update state for next transition
-        submarineStateData.position = { x: continueLeftX, y: 0, z: continueLeftZ }
-        submarineStateData.rotation = { x: continueLeftRotationX, y: continueLeftRotationY, z: 0 }
-        submarineStateData.scale = continueLeftScale
-        break
-        
       case 'diagonal_backward':
-        // DIAGONAL BACKWARD MOVEMENT STATE - EXACTLY LIKE NeMock.jsx
-        // Start from end position of move_forward_and_down
-        const backStartX = submarineStateData.position.x || -55
-        const backStartZ = submarineStateData.position.z || -40
-        const backStartScale = submarineStateData.scale || 0.4
+        // DIAGONAL BACKWARD MOVEMENT STATE (getting away from viewer)
+        // Start from end position of turn_right
+        const backStartX = submarineStateData.position.x || -42
+        const backStartZ = submarineStateData.position.z || -15
+        const backStartScale = submarineStateData.scale || 0.8
         
         // X-AXIS: Move right (positive X) - opposite of diagonal_forward
-        const backEndX = backStartX + 30 // Move 30 units right
+        const backEndX = backStartX + 30 // 🔧 TWEAK: Move 30 units right
         const backX = backStartX + (smoothProgress * (backEndX - backStartX))
         
         // Z-AXIS: Move away (negative Z) - getting smaller
-        const backEndZ = backStartZ - 20 // Move 20 units away
+        const backEndZ = backStartZ - 20 // 🔧 TWEAK: Move 20 units away
         const backZ = backStartZ + (smoothProgress * (backEndZ - backStartZ))
         
         // Set position with diagonal movement
         nautilus.position.set(backX, 0, backZ)
         
         // Keep the same rotation (nose pointing diagonal)
-        nautilus.rotation.set(0, submarineStateData.rightTargetRotation, 0) // Use rotation from turn_right
+        nautilus.rotation.set(0, rightTargetRotation, 0) // Use rotation from turn_right
         
         // Scale decreases as it gets away (depth perception)
-        const backEndScale = 0.3 // Much smaller when far away
+        const backEndScale = 0.3 // 🔧 TWEAK: Much smaller when far away
         const backScale = backStartScale + (smoothProgress * (backEndScale - backStartScale))
         nautilus.scale.setScalar(backScale)
         
         // Update state for next transition
         submarineStateData.position = { x: backX, y: 0, z: backZ }
-        submarineStateData.rotation = { x: 0, y: submarineStateData.rightTargetRotation, z: 0 }
+        submarineStateData.rotation = { x: 0, y: rightTargetRotation, z: 0 }
         submarineStateData.scale = backScale
         break
         
       case 'turn_right_varied':
-        // VARIED TURN RIGHT - EXACTLY LIKE NeMock.jsx
+        // VARIED TURN RIGHT - Different angle and movement
         // Start from end position of diagonal_backward
-        const turnVarStartX = submarineStateData.position.x || -25
-        const turnVarStartZ = submarineStateData.position.z || -60
+        const turnVarStartX = submarineStateData.position.x || -12
+        const turnVarStartZ = submarineStateData.position.z || -35
         const turnVarStartScale = submarineStateData.scale || 0.3
         
         // CONSTANT SPEED ROTATION: Different turn angle
-        const varStartRotation = submarineStateData.rightTargetRotation // Start from previous rotation
-        const varEndRotation = submarineStateData.rightTargetRotation + 0.4 // Turn 0.4 radians more
+        const varStartRotation = rightTargetRotation // 🔧 TWEAK: Start from previous rotation
+        const varEndRotation = rightTargetRotation + 0.4 // 🔧 TWEAK: Turn 0.4 radians more
         const varTargetRotation = varStartRotation + (smoothProgress * (varEndRotation - varStartRotation))
         nautilus.rotation.set(0, varTargetRotation, 0)
         
-        // Store the rotation for other states to use
-        submarineStateData.varTargetRotation = varTargetRotation
-        
         // CONSTANT SPEED Z-AXIS MOVEMENT: Stay at distance
-        const turnVarZ = turnVarStartZ + (smoothProgress * 5) // Move 5 units closer
+        const turnVarZ = turnVarStartZ + (smoothProgress * 5) // 🔧 TWEAK: Move 5 units closer
         nautilus.position.set(turnVarStartX, 0, turnVarZ)
         
         // CONSTANT SPEED SCALE: Stay small
-        const turnVarEndScale = 0.4 // Slightly bigger
+        const turnVarEndScale = 0.4 // 🔧 TWEAK: Slightly bigger
         const turnVarScale = turnVarStartScale + (smoothProgress * (turnVarEndScale - turnVarStartScale))
         nautilus.scale.setScalar(turnVarScale)
         
@@ -328,52 +204,90 @@ function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }
         break
         
       case 'move_forward':
-        // MOVE FORWARD STATE - EXACTLY LIKE NeMock.jsx
+        // MOVE FORWARD STATE (getting closer to viewer)
         // Start from end position of turn_right_varied
-        const forwardStartX = submarineStateData.position.x || -25
-        const forwardStartZ = submarineStateData.position.z || -55
+        const forwardStartX = submarineStateData.position.x || -12
+        const forwardStartZ = submarineStateData.position.z || -30
         const forwardStartScale = submarineStateData.scale || 0.4
         
         // X-AXIS: Move left (negative X) - towards center
-        const forwardEndX = forwardStartX - 20 // Move 20 units left
+        const forwardEndX = forwardStartX - 20 // 🔧 TWEAK: Move 20 units left
         const forwardX = forwardStartX + (smoothProgress * (forwardEndX - forwardStartX))
         
         // Z-AXIS: Move closer (positive Z) - getting bigger
-        const forwardEndZ = forwardStartZ + 30 // Move 30 units closer
+        const forwardEndZ = forwardStartZ + 30 // 🔧 TWEAK: Move 30 units closer
         const forwardZ = forwardStartZ + (smoothProgress * (forwardEndZ - forwardStartZ))
         
         // Set position
         nautilus.position.set(forwardX, 0, forwardZ)
         
         // Keep the same rotation
-        nautilus.rotation.set(0, submarineStateData.varTargetRotation, 0) // Use rotation from turn_right_varied
+        nautilus.rotation.set(0, varTargetRotation, 0) // Use rotation from turn_right_varied
         
         // Scale increases as it gets closer
-        const forwardEndScale = 1.2 // Bigger when close
+        const forwardEndScale = 1.2 // 🔧 TWEAK: Bigger when close
         const forwardScale = forwardStartScale + (smoothProgress * (forwardEndScale - forwardStartScale))
         nautilus.scale.setScalar(forwardScale)
         
         // Update state for next transition
         submarineStateData.position = { x: forwardX, y: 0, z: forwardZ }
-        submarineStateData.rotation = { x: 0, y: submarineStateData.varTargetRotation, z: 0 }
+        submarineStateData.rotation = { x: 0, y: varTargetRotation, z: 0 }
         submarineStateData.scale = forwardScale
         break
         
-      default:
-        console.warn(`Unknown movement type: ${currentInstruction.type}`)
-        break
+      // Future states will be added here:
+      // case 'turn_right':
+      // case 'move_forward':
+      // case 'move_backward':
+      // case 'move_left':
+      // case 'move_right':
     }
     
     // Check if state is complete and transition to next state (NO GLITCHES)
     if (stateProgress >= 1) {
-      submarineStateData.currentInstructionIndex++
-      submarineStateData.stateStartTime = time
+      if (submarineStateData.currentState === 'diagonal_forward') {
+        // SEAMLESS TRANSITION: Keep current position/scale, just change state
+        submarineStateData.currentState = 'turn_right' // 🔧 TWEAK: Now turns RIGHT instead of LEFT
+        submarineStateData.stateStartTime = time
+        submarineStateData.stateDuration = 8 // 🔧 TWEAK: Turn duration (seconds)
+        // Position/scale continue from previous state (no reset)
+      } else if (submarineStateData.currentState === 'turn_right') {
+        // TRANSITION TO MOVE FORWARD AND DOWN
+        submarineStateData.currentState = 'move_forward_and_down'
+        submarineStateData.stateStartTime = time
+        submarineStateData.stateDuration = 4 // 🔧 TWEAK: Forward and down duration (seconds)
+        // Position/scale continue from previous state (no reset)
+      } else if (submarineStateData.currentState === 'move_forward_and_down') {
+        // TRANSITION TO DIAGONAL BACKWARD
+        submarineStateData.currentState = 'diagonal_backward'
+        submarineStateData.stateStartTime = time
+        submarineStateData.stateDuration = 6 // 🔧 TWEAK: Backward duration (seconds)
+        // Position/scale continue from previous state (no reset)
+      } else if (submarineStateData.currentState === 'diagonal_backward') {
+        // TRANSITION TO VARIED TURN RIGHT
+        submarineStateData.currentState = 'turn_right_varied'
+        submarineStateData.stateStartTime = time
+        submarineStateData.stateDuration = 5 // 🔧 TWEAK: Varied turn duration (seconds)
+        // Position/scale continue from previous state (no reset)
+      } else if (submarineStateData.currentState === 'turn_right_varied') {
+        // TRANSITION TO MOVE FORWARD
+        submarineStateData.currentState = 'move_forward'
+        submarineStateData.stateStartTime = time
+        submarineStateData.stateDuration = 7 // 🔧 TWEAK: Forward duration (seconds)
+        // Position/scale continue from previous state (no reset)
+      } else if (submarineStateData.currentState === 'move_forward') {
+        // RESTART CYCLE: Reset to starting position
+        submarineStateData.currentState = 'diagonal_forward'
+        submarineStateData.stateStartTime = time
+        submarineStateData.stateDuration = 8 // 🔧 TWEAK: Diagonal duration (seconds)
+        submarineStateData.position = { x: 0, y: 0, z: -80 } // 🔧 TWEAK: Starting position
+        submarineStateData.rotation = { x: 0, y: -Math.PI / 2 - 0.3, z: 0 } // 🔧 TWEAK: Starting rotation
+        submarineStateData.scale = 0.5 // 🔧 TWEAK: Starting scale
+      }
     }
     
     // Hover effect
-    if (hovered) {
-      nautilus.scale.setScalar(submarineStateData.scale * 1.1)
-    }
+    nautilus.scale.setScalar(hovered ? 1.1 : 1.0)
   })
   
   const handleClick = () => {
@@ -393,6 +307,8 @@ function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }
   return (
     <group 
       ref={nautilusRef} 
+      position={[0, 0, -80]} // CENTER OF SCREEN - FINDING NOSE
+      rotation={[0, -Math.PI / 2 - 0.3, 0]} // ROTATE 90° LEFT TO FACE FORWARD
       onClick={handleClick}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
@@ -428,9 +344,7 @@ function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }
   )
 }
 
-// ============================================================================
-// LIGHTING COMPONENT
-// ============================================================================
+// Iluminación y partículas igual que antes
 function NautilusLighting({ isCurrentSong, isPlaying }) {
   const lightsRef = useRef()
   useFrame((state) => {
@@ -464,9 +378,6 @@ function NautilusLighting({ isCurrentSong, isPlaying }) {
   )
 }
 
-// ============================================================================
-// UNDERWATER PARTICLES COMPONENT
-// ============================================================================
 function UnderwaterParticles({ isPlaying }) {
   const particlesRef = useRef()
   useFrame((state) => {
@@ -519,4 +430,4 @@ function UnderwaterParticles({ isPlaying }) {
   )
 }
 
-export default NemoTears
+export default NemoTears 

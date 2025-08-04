@@ -34,6 +34,7 @@ An immersive, interactive web experience for the thrash metal band "Killgorithm"
 
 ### Prerequisites
 - Node.js 16+ 
+- Python 3.8+ (for virtual environment)
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 
 ### Installation
@@ -44,7 +45,19 @@ An immersive, interactive web experience for the thrash metal band "Killgorithm"
    cd KILLGORITHM
    ```
 
-2. **Install dependencies**
+2. **Set up Python virtual environment**
+   ```bash
+   # Create virtual environment
+   python3 -m venv venv
+   
+   # Activate virtual environment
+   # On macOS/Linux:
+   source venv/bin/activate
+   # On Windows:
+   # venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
    ```bash
    npm install
    ```

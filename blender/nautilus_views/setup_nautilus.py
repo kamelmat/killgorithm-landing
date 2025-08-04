@@ -1,91 +1,65 @@
 import bpy
 import os
-import math
 
-print("Base path:", base_path)
-print("Image folder:", img_folder)
-for file in os.listdir(img_folder):
-    print("Found image:", file)
-
-# Limpia la escena
+# Elimina todos los objetos
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 
-# Ruta base del archivo .blend
-base_path = bpy.path.abspath("//")
+# Ruta base del proyecto
+base_path = "/Users/user/Documents/code/killgorithm/blender/nautilus_views"
+ref_path = os.path.join(base_path, "reference")
 
-# Carpeta con las imágenes
-img_folder = os.path.join(base_path, "reference")
-
-# Diccionario de imágenes
+# Diccionario con vistas y archivos de imagen
 image_files = {
-    "back": "nautilus_back.png",
-    "far": "nautilus_far.png",
-    "forn_lights": "nautilus_forn_lights.png",
-    "front": "nautilus_front.png",
-    "full_side_right": "nautilus_full_side_right.png",
-    "right_profile": "nautilus_righ_profile.png",
-    "turn": "nautilus_turn.png",
-    "right": "nautilusright.png"
+    "back": "nautilus_back.jpg",
+    "far": "nautilus_far.jpg",
+    "forn_lights": "nautilus_forn_lights.jpg",
+    "front": "nautilus_front.jpg",
+    "full_side_right": "nautilus_full_side_right.jpg",
+    "right_profile": "nautilus_righ_profile.jpg",  # nombre original en carpeta
+    "turn": "nautilus_turn.jpg",
+    "right": "nautilusright.jpg"
 }
 
-# Crea los planos con las imágenes
-plane_size = 2
-angle_step = 360 / len(image_files)
-radius = 5
-i = 0
+# Crea un cubo para tener de referencia
+bpy.ops.mesh.primitive_cube_add(size=2)
 
-for name, filename in image_files.items():
-    image_path = os.path.join(img_folder, filename)
-    
-    # Carga la imagen
-    img = bpy.data.images.load(image_path)
-    
-    # Crea un material con la imagen
-    mat = bpy.data.materials.new(name=name)
+# Función para crear plano con imagen
+def create_image_plane(name, img_path, location, rotation):
+    # Cargar imagen
+    img = bpy.data.images.load(img_path)
+
+    # Crear material
+    mat = bpy.data.materials.new(name + "_Mat")
     mat.use_nodes = True
-    bsdf = mat.node_tree.nodes["Principled BSDF"]
-    
-    tex_image = mat.node_tree.nodes.new("ShaderNodeTexImage")
+    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+    tex_image = mat.node_tree.nodes.new('ShaderNodeTexImage')
     tex_image.image = img
     mat.node_tree.links.new(bsdf.inputs['Base Color'], tex_image.outputs['Color'])
-    
-    # Crea un plano
-    bpy.ops.mesh.primitive_plane_add(size=plane_size)
-    plane = bpy.context.active_object
-    plane.name = f"Plane_{name}"
+
+    # Crear plano
+    bpy.ops.mesh.primitive_plane_add(size=2, location=location, rotation=rotation)
+    plane = bpy.context.object
+    plane.name = name
     plane.data.materials.append(mat)
 
-    # Ubica el plano en círculo
-    angle = math.radians(i * angle_step)
-    plane.location.x = radius * math.cos(angle)
-    plane.location.y = radius * math.sin(angle)
-    plane.rotation_euler.z = angle + math.pi
-    i += 1
+# Parámetros para ubicación y rotación de cada imagen
+positions = {
+    "front": ((0, -3, 0), (0, 0, 0)),
+    "back": ((0, 3, 0), (0, 0, 3.1416)),
+    "right": ((3, 0, 0), (0, 0, 1.5708)),
+    "right_profile": ((3, 0, 2), (0, 0, 1.5708)),
+    "far": ((0, -5, 0), (0, 0, 0)),
+    "forn_lights": ((-3, 0, 0), (0, 0, -1.5708)),
+    "full_side_right": ((3, 0, -2), (0, 0, 1.5708)),
+    "turn": ((0, 0, 3), (1.5708, 0, 0)),
+}
 
-# Crea un cubo en el centro
-bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 0, 0))
-
-# Crea la cámara
-bpy.ops.object.camera_add(location=(0, -7, 2), rotation=(math.radians(75), 0, 0))
-camera = bpy.context.active_object
-bpy.context.scene.camera = camera
-
-# Crea un empty en el centro para animar la cámara alrededor
-bpy.ops.object.empty_add(type='PLAIN_AXES', location=(0, 0, 0))
-pivot = bpy.context.active_object
-
-# Parentea la cámara al empty
-camera.parent = pivot
-
-# Inserta keyframes para animar el empty
-pivot.rotation_mode = 'XYZ'
-pivot.keyframe_insert(data_path="rotation_euler", frame=1)
-
-pivot.rotation_euler[2] = math.radians(360)
-pivot.keyframe_insert(data_path="rotation_euler", frame=250)
-
-# Ajusta interpolación a lineal
-for fcurve in pivot.animation_data.action.fcurves:
-    for keyframe in fcurve.keyframe_points:
-        keyframe.interpolation = 'LINEAR'
+# Crear los planos
+for name, filename in image_files.items():
+    full_path = os.path.join(ref_path, filename)
+    if os.path.exists(full_path):
+        loc, rot = positions.get(name, ((0, 0, 0), (0, 0, 0)))
+        create_image_plane(name, full_path, loc, rot)
+    else:
+        print(f"⚠️ Imagen no encontrada: {filename}")
