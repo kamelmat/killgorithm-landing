@@ -3,9 +3,12 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { CONFIG } from '../config/config'
 import NemoTears from '../avatars/NemoTears'
+import AveDePresa from '../avatars/AveDePresa'
+import ZoneDebugger from './ZoneDebugger'
 
 const AVATAR_COMPONENTS = { 
-  'NemoTears': NemoTears
+  'NemoTears': NemoTears,
+  'AveDePresa': AveDePresa
 }
 
 function Experience({ currentSong, isPlaying, onSongSelect }) {
@@ -62,6 +65,9 @@ function Experience({ currentSong, isPlaying, onSongSelect }) {
       
       {/* Particle Effects */}
       <ParticleEffects currentSong={currentSong} isPlaying={isPlaying} />
+      
+      {/* Zone Debugger - uncomment to visualize movement zones */}
+      {/* <ZoneDebugger showZones={true} /> */}
     </>
   )
 }

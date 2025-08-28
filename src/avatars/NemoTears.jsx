@@ -2,38 +2,21 @@ import React, { useRef, useState, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import { movementOrchestrator } from '../utils/MovementOrchestrator'
 
 // ============================================================================
-// CONFIGURABLE MOVEMENT PARAMETERS
+// SIMPLE MOVEMENT CONFIGURATION
 // ============================================================================
 const MOVEMENT_CONFIG = {
-  // Speed settings
-  MOVEMENT_SPEED: 1.5,        // units per second
-  ROTATION_SPEED: 0.5,        // radians per second
+  SPEED: 2.0,                 // Forward movement speed
+  TURN_SPEED: 0.8,           // How fast it turns (radians per second)
+  TURN_RADIUS: 8,            // How wide the turns are
   
-  // Scale settings for depth perception
-  SCALE_NEAR: 1.5,            // size when close to camera
-  SCALE_FAR: 0.4,             // size when far from camera
-  
-  // Starting position and orientation
-  START_POSITION: { x: 0, y: 0, z: -80 },
-  START_ROTATION: { x: 0, y: -Math.PI / 2 - 0.3, z: 0 },
-  START_SCALE: 0.5,
+  // Starting position and nose direction
+  START_POSITION: { x: 0, y: -5, z: -30 },  // Start underwater
+  START_ROTATION: 0,         // 0 = pointing right, Math.PI/2 = pointing forward, etc.
+  START_SCALE: 1.0
 }
-
-// ============================================================================
-// MOVEMENT INSTRUCTIONS - Define the journey here
-// ============================================================================
-const MOVEMENT_INSTRUCTIONS = [
-  { type: 'diagonal_forward', duration: 8 },
-  { type: 'turn_right', duration: 8, angle: 135 },
-  { type: 'move_forward_and_down', duration: 8 }, // 🔧 FIXED: Increased from 4 to 8 seconds
-  { type: 'continue_diagonal_left', duration: 10 }, // NEW: Continue trajectory with graceful movement
-  // TEMPORARILY COMMENTED OUT TO TEST
-  // { type: 'diagonal_backward', duration: 6 },
-  // { type: 'turn_right_varied', duration: 5 },
-  // { type: 'move_forward', duration: 7 }
-]
 
 function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }) {
   const nautilusRef = useRef()
@@ -42,337 +25,141 @@ function NemoTears({ isPlaying, songData, isCurrentSong, onClick, movementZone }
   const { nodes } = useGLTF('/blender/nautilus_views/nautilus.glb')
 
   // ============================================================================
-  // SUBMARINE STATE SYSTEM - EXACTLY LIKE NeMock.jsx
+  // ORCHESTRATED NAVIGATION STATE
   // ============================================================================
-  const submarineState = useRef({
-    // Current position and rotation
-    position: { x: 0, y: 0, z: -80 }, // Starting position
-    rotation: { x: 0, y: -Math.PI / 2 - 0.3, z: 0 }, // Starting diagonal rotation
-    scale: 0.5, // Starting scale
+  const navigationState = useRef({
+    // Current position and orientation
+    position: { ...MOVEMENT_CONFIG.START_POSITION },
+    rotation: MOVEMENT_CONFIG.START_ROTATION,
+    scale: MOVEMENT_CONFIG.START_SCALE,
+    
+    // Target waypoint
+    currentWaypointIndex: 0,
+    targetPosition: null,
+    waypoints: [],
     
     // Movement state
-    currentInstructionIndex: 0,
-    currentState: 'diagonal_forward', // Current movement state
-    stateStartTime: 0, // When current state started
-    stateDuration: 8, // How long current state lasts
-    
-    // Movement parameters
-    speed: 1.5, // Base movement speed
-    turnSpeed: 0.5, // Turn speed multiplier
-    
-    // Store rotation values for cross-state access
-    rightTargetRotation: -Math.PI / 2 - 0.3, // Store turn_right rotation
-    varTargetRotation: -Math.PI / 2 - 0.3, // Store turn_right_varied rotation
+    isInitialized: false,
+    zone: null
   })
 
+  // Register with orchestrator on mount
+  useEffect(() => {
+    const zone = movementOrchestrator.registerAvatar('submarine', MOVEMENT_CONFIG.START_POSITION)
+    if (zone) {
+      navigationState.current.zone = zone
+      navigationState.current.waypoints = movementOrchestrator.getWaypointsForAvatar('submarine')
+      navigationState.current.targetPosition = { ...navigationState.current.waypoints[0] }
+    }
+  }, [])
+
   // ============================================================================
-  // MAIN ANIMATION LOOP - EXACTLY LIKE NeMock.jsx
+  // SIMPLE NOSE-FORWARD NAVIGATION LOOP
   // ============================================================================
   
   useFrame((frameState, delta) => {
     const nautilus = nautilusRef.current
     if (!nautilus) return
 
-    const time = frameState.clock.elapsedTime
-
-    // STATE-BASED MOVEMENT SYSTEM
-    const submarineStateData = submarineState.current
+    const nav = navigationState.current
     
-    // Initialize state start time
-    if (submarineStateData.stateStartTime === 0) {
-      submarineStateData.stateStartTime = time
-    }
-    
-    // Get current instruction
-    const currentInstruction = MOVEMENT_INSTRUCTIONS[submarineStateData.currentInstructionIndex]
-    if (!currentInstruction) {
-      // Journey complete - restart
-      submarineStateData.currentInstructionIndex = 0
-      submarineStateData.stateStartTime = time
-      submarineStateData.currentState = 'diagonal_forward'
-      submarineStateData.position = { x: 0, y: 0, z: -80 }
-      submarineStateData.rotation = { x: 0, y: -Math.PI / 2 - 0.3, z: 0 }
-      submarineStateData.scale = 0.5
-      submarineStateData.rightTargetRotation = -Math.PI / 2 - 0.3
-      submarineStateData.varTargetRotation = -Math.PI / 2 - 0.3
+    // Initialize position on first frame
+    if (!nav.isInitialized) {
+      nautilus.position.set(nav.position.x, nav.position.y, nav.position.z)
+      nautilus.rotation.y = nav.rotation
+      nautilus.scale.setScalar(nav.scale)
+      nav.isInitialized = true
       return
     }
     
-    // Calculate state progress
-    const stateElapsed = time - submarineStateData.stateStartTime
-    const stateProgress = Math.min(stateElapsed / currentInstruction.duration, 1)
-    const smoothProgress = stateProgress * stateProgress * (3 - 2 * stateProgress) // Smoothstep
+    // ============================================================================
+    // STEP 1: Calculate direction to target waypoint
+    // ============================================================================
+    const target = nav.targetPosition
+    const current = nav.position
     
-    // Execute current state
-    switch (currentInstruction.type) {
-      case 'diagonal_forward':
-        // DIAGONAL FORWARD MOVEMENT STATE - EXACTLY LIKE NeMock.jsx
-        // X-AXIS: Move left (negative X)
-        const startX = 0
-        const endX = -40 // Move 40 units left
-        const x = startX + (smoothProgress * (endX - startX)) // X: 0 → -40
-        
-        // Z-AXIS: Move closer (positive Z) - increases size
-        const startZ = -80 // Starting position
-        const endZ = -20 // End position (closer to viewer)
-        const z = startZ + (smoothProgress * (endZ - startZ)) // Z: -80 → -20
-        
-        // Set position with diagonal movement
-        nautilus.position.set(x, 0, z)
-        
-        // Keep the same rotation (nose pointing diagonal)
-        nautilus.rotation.set(0, -Math.PI / 2 - 0.3, 0) // Maintain diagonal direction
-        
-        // Scale increases as it gets closer (depth perception)
-        const startScale = 0.5 // Smaller when far
-        const endScale = 1.5 // Bigger when close
-        const scale = startScale + (smoothProgress * (endScale - startScale)) // Scale: 0.5 → 1.5
-        nautilus.scale.setScalar(scale)
-        
-        // Update state position for next state
-        submarineStateData.position = { x, y: 0, z }
-        submarineStateData.rotation = { x: 0, y: -Math.PI / 2 - 0.3, z: 0 }
-        submarineStateData.scale = scale
-        break
-        
-      case 'turn_right':
-        // GRADUAL TURN RIGHT - EXACTLY LIKE NeMock.jsx
-        // Start from end position of diagonal_forward (NO GLITCH - CONTINUOUS)
-        const turnRightStartX = -40 // 🔧 FIXED: Use actual end position from diagonal_forward
-        const turnRightStartZ = -20 // 🔧 FIXED: Use actual end position from diagonal_forward
-        const turnRightStartScale = 1.0 // 🔧 FIXED: Use actual end scale from diagonal_forward
-        
-        // CONSTANT SPEED ROTATION: BIGGER turn (more rotation) - TURNING RIGHT
-        const rightStartRotation = -Math.PI / 2 - 0.3
-        const rightEndRotation = -Math.PI / 2 - 2.2 // BIGGER ending angle + 45° more (larger turn RIGHT)
-        
-        // LINEAR INTERPOLATION for constant speed (no acceleration/deceleration)
-        const rightTargetRotation = rightStartRotation + (smoothProgress * (rightEndRotation - rightStartRotation))
-        nautilus.rotation.set(0, rightTargetRotation, 0)
-        
-        // Store the rotation for other states to use
-        submarineStateData.rightTargetRotation = rightTargetRotation
-        
-        // NO MOVEMENT DURING TURN - JUST ROTATION
-        // Keep the same position throughout the turn
-        nautilus.position.set(turnRightStartX, 0, turnRightStartZ)
-        
-        // NO SCALE CHANGE DURING TURN - JUST ROTATION
-        // Keep the same scale throughout the turn
-        nautilus.scale.setScalar(turnRightStartScale)
-        
-        // Update state for next transition (NO GLITCH - SEAMLESS)
-        submarineStateData.position = { x: turnRightStartX, y: 0, z: turnRightStartZ }
-        submarineStateData.rotation = { x: 0, y: rightTargetRotation, z: 0 }
-        submarineStateData.scale = turnRightStartScale
-        
-        // DEBUG: Log the turn_right end position
-        if (stateProgress === 1) {
-          console.log('🔍 turn_right END:', { x: turnRightStartX, z: turnRightStartZ, scale: turnRightStartScale })
-        }
-        break
-        
-      case 'move_forward_and_down':
-        // MOVE FORWARD AND DOWN STATE - EXACTLY LIKE NeMock.jsx
-        // Start from end position of turn_right (which should be -40, -20, 1.0)
-        const forwardDownStartX = -40 // 🔧 FIXED: Use hardcoded correct position from turn_right
-        const forwardDownStartZ = -20 // 🔧 FIXED: Use hardcoded correct position from turn_right
-        const forwardDownStartScale = 1.0 // 🔧 FIXED: Use hardcoded correct scale from turn_right
-        
-        // DEBUG: Log the starting position
-        if (stateProgress === 0) {
-          console.log('🔍 move_forward_and_down START:', { x: forwardDownStartX, z: forwardDownStartZ, scale: forwardDownStartScale })
-          console.log('🔍 submarineStateData.position:', submarineStateData.position)
-        }
-        
-        // X-AXIS: Move left (negative X) - maintaining diagonal direction
-        const forwardDownEndX = forwardDownStartX - 5.86 // 🔧 FIXED: 25% more = 4.69 * 1.25 = 5.86 units left
-        const forwardDownX = forwardDownStartX + (smoothProgress * (forwardDownEndX - forwardDownStartX))
-        
-        // Z-AXIS: Move away (negative Z) - getting smaller
-        const forwardDownEndZ = forwardDownStartZ - 7.81 // 🔧 FIXED: 25% more = 6.25 * 1.25 = 7.81 units away
-        const forwardDownZ = forwardDownStartZ + (smoothProgress * (forwardDownEndZ - forwardDownStartZ))
-        
-        // Set position with diagonal movement
-        nautilus.position.set(forwardDownX, 0, forwardDownZ)
-        
-        // ROTATION: Incline nose down 3% (X-axis rotation)
-        const startRotationY = submarineStateData.rightTargetRotation // Keep Y rotation from turn_right
-        const startRotationX = 0 // Starting X rotation (level)
-        const endRotationX = -0.03 // 3% nose down (negative X rotation)
-        const currentRotationX = startRotationX + (smoothProgress * (endRotationX - startRotationX))
-        
-        nautilus.rotation.set(currentRotationX, startRotationY, 0)
-        
-        // Scale decreases as it gets away (depth perception)
-        const forwardDownEndScale = 0.85 // 🔧 FIXED: Slightly more scale reduction for longer distance
-        const forwardDownScale = forwardDownStartScale + (smoothProgress * (forwardDownEndScale - forwardDownStartScale))
-        nautilus.scale.setScalar(forwardDownScale)
-        
-        // DEBUG: Log the ending position
-        if (stateProgress === 1) {
-          console.log('🔍 move_forward_and_down END:', { x: forwardDownX, z: forwardDownZ, scale: forwardDownScale })
-        }
-        
-        // Update state for next transition
-        submarineStateData.position = { x: forwardDownX, y: 0, z: forwardDownZ }
-        submarineStateData.rotation = { x: currentRotationX, y: startRotationY, z: 0 }
-        submarineStateData.scale = forwardDownScale
-        break
-        
-      case 'continue_diagonal_left':
-        // CONTINUE DIAGONAL LEFT - NEW MOVEMENT
-        // Start from end position of move_forward_and_down (-45.86, 0, -27.81, scale 0.85)
-        const continueLeftStartX = -45.86 // 🔧 FIXED: Use hardcoded end position from move_forward_and_down
-        const continueLeftStartZ = -27.81 // 🔧 FIXED: Use hardcoded end position from move_forward_and_down
-        const continueLeftStartScale = 0.85 // 🔧 FIXED: Use hardcoded end scale from move_forward_and_down
-        
-        // DEBUG: Log the starting position
-        if (stateProgress === 0) {
-          console.log('🔍 continue_diagonal_left START:', { x: continueLeftStartX, z: continueLeftStartZ, scale: continueLeftStartScale })
-        }
-        
-        // X-AXIS: Continue left (negative X) - maintaining trajectory
-        const continueLeftEndX = continueLeftStartX - 8 // Move 8 units further left
-        const continueLeftX = continueLeftStartX + (smoothProgress * (continueLeftEndX - continueLeftStartX))
-        
-        // Z-AXIS: Continue away (negative Z) - getting smaller
-        const continueLeftEndZ = continueLeftStartZ - 10 // Move 10 units further away
-        const continueLeftZ = continueLeftStartZ + (smoothProgress * (continueLeftEndZ - continueLeftStartZ))
-        
-        // Set position with diagonal movement
-        nautilus.position.set(continueLeftX, 0, continueLeftZ)
-        
-        // ROTATION: Maintain current rotation (nose pointing in trajectory direction)
-        const continueLeftRotationY = submarineStateData.rightTargetRotation // Keep Y rotation from turn_right
-        const continueLeftRotationX = -0.03 // Keep X rotation (nose down) from move_forward_and_down
-        nautilus.rotation.set(continueLeftRotationX, continueLeftRotationY, 0)
-        
-        // Scale decreases as it gets away (depth perception)
-        const continueLeftEndScale = 0.65 // Smaller when further away
-        const continueLeftScale = continueLeftStartScale + (smoothProgress * (continueLeftEndScale - continueLeftStartScale))
-        nautilus.scale.setScalar(continueLeftScale)
-        
-        // DEBUG: Log the ending position
-        if (stateProgress === 1) {
-          console.log('🔍 continue_diagonal_left END:', { x: continueLeftX, z: continueLeftZ, scale: continueLeftScale })
-        }
-        
-        // Update state for next transition
-        submarineStateData.position = { x: continueLeftX, y: 0, z: continueLeftZ }
-        submarineStateData.rotation = { x: continueLeftRotationX, y: continueLeftRotationY, z: 0 }
-        submarineStateData.scale = continueLeftScale
-        break
-        
-      case 'diagonal_backward':
-        // DIAGONAL BACKWARD MOVEMENT STATE - EXACTLY LIKE NeMock.jsx
-        // Start from end position of move_forward_and_down
-        const backStartX = submarineStateData.position.x || -55
-        const backStartZ = submarineStateData.position.z || -40
-        const backStartScale = submarineStateData.scale || 0.4
-        
-        // X-AXIS: Move right (positive X) - opposite of diagonal_forward
-        const backEndX = backStartX + 30 // Move 30 units right
-        const backX = backStartX + (smoothProgress * (backEndX - backStartX))
-        
-        // Z-AXIS: Move away (negative Z) - getting smaller
-        const backEndZ = backStartZ - 20 // Move 20 units away
-        const backZ = backStartZ + (smoothProgress * (backEndZ - backStartZ))
-        
-        // Set position with diagonal movement
-        nautilus.position.set(backX, 0, backZ)
-        
-        // Keep the same rotation (nose pointing diagonal)
-        nautilus.rotation.set(0, submarineStateData.rightTargetRotation, 0) // Use rotation from turn_right
-        
-        // Scale decreases as it gets away (depth perception)
-        const backEndScale = 0.3 // Much smaller when far away
-        const backScale = backStartScale + (smoothProgress * (backEndScale - backStartScale))
-        nautilus.scale.setScalar(backScale)
-        
-        // Update state for next transition
-        submarineStateData.position = { x: backX, y: 0, z: backZ }
-        submarineStateData.rotation = { x: 0, y: submarineStateData.rightTargetRotation, z: 0 }
-        submarineStateData.scale = backScale
-        break
-        
-      case 'turn_right_varied':
-        // VARIED TURN RIGHT - EXACTLY LIKE NeMock.jsx
-        // Start from end position of diagonal_backward
-        const turnVarStartX = submarineStateData.position.x || -25
-        const turnVarStartZ = submarineStateData.position.z || -60
-        const turnVarStartScale = submarineStateData.scale || 0.3
-        
-        // CONSTANT SPEED ROTATION: Different turn angle
-        const varStartRotation = submarineStateData.rightTargetRotation // Start from previous rotation
-        const varEndRotation = submarineStateData.rightTargetRotation + 0.4 // Turn 0.4 radians more
-        const varTargetRotation = varStartRotation + (smoothProgress * (varEndRotation - varStartRotation))
-        nautilus.rotation.set(0, varTargetRotation, 0)
-        
-        // Store the rotation for other states to use
-        submarineStateData.varTargetRotation = varTargetRotation
-        
-        // CONSTANT SPEED Z-AXIS MOVEMENT: Stay at distance
-        const turnVarZ = turnVarStartZ + (smoothProgress * 5) // Move 5 units closer
-        nautilus.position.set(turnVarStartX, 0, turnVarZ)
-        
-        // CONSTANT SPEED SCALE: Stay small
-        const turnVarEndScale = 0.4 // Slightly bigger
-        const turnVarScale = turnVarStartScale + (smoothProgress * (turnVarEndScale - turnVarStartScale))
-        nautilus.scale.setScalar(turnVarScale)
-        
-        // Update state for next transition
-        submarineStateData.position = { x: turnVarStartX, y: 0, z: turnVarZ }
-        submarineStateData.rotation = { x: 0, y: varTargetRotation, z: 0 }
-        submarineStateData.scale = turnVarScale
-        break
-        
-      case 'move_forward':
-        // MOVE FORWARD STATE - EXACTLY LIKE NeMock.jsx
-        // Start from end position of turn_right_varied
-        const forwardStartX = submarineStateData.position.x || -25
-        const forwardStartZ = submarineStateData.position.z || -55
-        const forwardStartScale = submarineStateData.scale || 0.4
-        
-        // X-AXIS: Move left (negative X) - towards center
-        const forwardEndX = forwardStartX - 20 // Move 20 units left
-        const forwardX = forwardStartX + (smoothProgress * (forwardEndX - forwardStartX))
-        
-        // Z-AXIS: Move closer (positive Z) - getting bigger
-        const forwardEndZ = forwardStartZ + 30 // Move 30 units closer
-        const forwardZ = forwardStartZ + (smoothProgress * (forwardEndZ - forwardStartZ))
-        
-        // Set position
-        nautilus.position.set(forwardX, 0, forwardZ)
-        
-        // Keep the same rotation
-        nautilus.rotation.set(0, submarineStateData.varTargetRotation, 0) // Use rotation from turn_right_varied
-        
-        // Scale increases as it gets closer
-        const forwardEndScale = 1.2 // Bigger when close
-        const forwardScale = forwardStartScale + (smoothProgress * (forwardEndScale - forwardStartScale))
-        nautilus.scale.setScalar(forwardScale)
-        
-        // Update state for next transition
-        submarineStateData.position = { x: forwardX, y: 0, z: forwardZ }
-        submarineStateData.rotation = { x: 0, y: submarineStateData.varTargetRotation, z: 0 }
-        submarineStateData.scale = forwardScale
-        break
-        
-      default:
-        console.warn(`Unknown movement type: ${currentInstruction.type}`)
-        break
+    // Vector from current position to target
+    const toTarget = {
+      x: target.x - current.x,
+      y: target.y - current.y,
+      z: target.z - current.z
     }
     
-    // Check if state is complete and transition to next state (NO GLITCHES)
-    if (stateProgress >= 1) {
-      submarineStateData.currentInstructionIndex++
-      submarineStateData.stateStartTime = time
+    // Distance to target
+    const distanceToTarget = Math.sqrt(toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z)
+    
+    // Check if we've reached the current waypoint (within 2 units)
+    if (distanceToTarget < 2) {
+      // Move to next waypoint
+      nav.currentWaypointIndex = (nav.currentWaypointIndex + 1) % nav.waypoints.length
+      nav.targetPosition = { ...nav.waypoints[nav.currentWaypointIndex] }
+      console.log(`🚢 Nautilus heading to waypoint ${nav.currentWaypointIndex}:`, nav.targetPosition)
+      return // Skip this frame to recalculate with new target
     }
     
-    // Hover effect
-    if (hovered) {
-      nautilus.scale.setScalar(submarineStateData.scale * 1.1)
+    // ============================================================================
+    // STEP 2: Calculate desired nose direction (angle to target)
+    // ============================================================================
+    const desiredRotation = Math.atan2(toTarget.x, toTarget.z) // atan2(x, z) gives Y-axis rotation
+    
+    // ============================================================================
+    // STEP 3: Smoothly turn nose towards target
+    // ============================================================================
+    let rotationDiff = desiredRotation - nav.rotation
+    
+    // Handle angle wrapping (shortest path)
+    while (rotationDiff > Math.PI) rotationDiff -= 2 * Math.PI
+    while (rotationDiff < -Math.PI) rotationDiff += 2 * Math.PI
+    
+    // Apply turn speed limit
+    const maxTurnThisFrame = MOVEMENT_CONFIG.TURN_SPEED * delta
+    if (Math.abs(rotationDiff) > maxTurnThisFrame) {
+      rotationDiff = Math.sign(rotationDiff) * maxTurnThisFrame
+    }
+    
+    nav.rotation += rotationDiff
+    
+    // ============================================================================
+    // STEP 4: Move forward in nose direction
+    // ============================================================================
+    const speed = MOVEMENT_CONFIG.SPEED * delta
+    
+    // Calculate forward vector based on nose direction
+    const forwardX = Math.sin(nav.rotation) * speed
+    const forwardZ = Math.cos(nav.rotation) * speed
+    
+    // Move forward
+    nav.position.x += forwardX
+    nav.position.z += forwardZ
+    
+    // Simple Y movement towards target (up/down)
+    const yDiff = toTarget.y
+    nav.position.y += Math.sign(yDiff) * Math.min(Math.abs(yDiff), speed) * 0.5 // Slower Y movement
+    
+    // ============================================================================
+    // STEP 5: Apply depth-based scaling (bigger when closer to camera)
+    // ============================================================================
+    const bounds = nav.zone ? nav.zone.bounds : { z: [-60, -10] }
+    const zNormalized = (nav.position.z - bounds.z[0]) / (bounds.z[1] - bounds.z[0])
+    nav.scale = 0.4 + (1 - zNormalized) * 1.2 // Scale from 0.4 (far) to 1.6 (close)
+    
+    // ============================================================================
+    // STEP 6: Update Three.js object
+    // ============================================================================
+    nautilus.position.set(nav.position.x, nav.position.y, nav.position.z)
+    nautilus.rotation.y = nav.rotation
+    nautilus.scale.setScalar(nav.scale * (hovered ? 1.1 : 1.0))
+    
+    // ============================================================================
+    // STEP 7: Update orchestrator and check boundaries
+    // ============================================================================
+    movementOrchestrator.updatePosition('submarine', nav.position)
+    
+    // Check if out of assigned zone
+    if (nav.zone && !movementOrchestrator.isPositionInZone('submarine', nav.position)) {
+      // Get a safe waypoint within zone
+      nav.targetPosition = movementOrchestrator.getSafeWaypoint('submarine')
+      console.log('🚢 Nautilus out of zone, heading to safe waypoint:', nav.targetPosition)
     }
   })
   
@@ -448,16 +235,23 @@ function NautilusLighting({ isCurrentSong, isPlaying }) {
   
   return (
     <group ref={lightsRef}>
-      <pointLight position={[0, 0, 3]} intensity={0.4} color="#00ffff" distance={10} decay={3} />
-      <pointLight position={[0, 2, 0]} intensity={0.3} color="#00ffff" distance={8} decay={3} />
-      <pointLight position={[0, -2, 0]} intensity={0.2} color="#00ffff" distance={8} decay={3} />
-      <pointLight position={[-2, 0, 0]} intensity={0.25} color="#00ffff" distance={8} decay={3} />
-      <pointLight position={[2, 0, 0]} intensity={0.25} color="#00ffff" distance={8} decay={3} />
-      <pointLight position={[0, 0, -3]} intensity={0.2} color="#00ffff" distance={8} decay={3} />
+      {/* SUBMARINE FOLLOWING LIGHT - Moves with the submarine */}
+      <pointLight position={[0, 0, 3]} intensity={1.5} color="#00ffff" distance={20} decay={1.5} />
+      <pointLight position={[0, 2, 0]} intensity={1.2} color="#00ffff" distance={15} decay={1.5} />
+      <pointLight position={[0, -2, 0]} intensity={0.8} color="#00ffff" distance={15} decay={1.5} />
+      <pointLight position={[-2, 0, 0]} intensity={1.0} color="#00ffff" distance={15} decay={1.5} />
+      <pointLight position={[2, 0, 0]} intensity={1.0} color="#00ffff" distance={15} decay={1.5} />
+      <pointLight position={[0, 0, -3]} intensity={0.8} color="#00ffff" distance={15} decay={1.5} />
+      
+      {/* WIDE AREA LIGHTS - Cover the entire movement range */}
+      <pointLight position={[20, 0, -40]} intensity={0.8} color="#00ffff" distance={30} decay={1} />
+      <pointLight position={[-20, 0, -40]} intensity={0.8} color="#00ffff" distance={30} decay={1} />
+      <pointLight position={[0, 0, -40]} intensity={1.0} color="#00ffff" distance={40} decay={1} />
+      
       {isPlaying && (
         <>
-          <pointLight position={[-0.8, 0, -3]} intensity={0.8} color="#ff6600" distance={6} decay={2} />
-          <pointLight position={[0.8, 0, -3]} intensity={0.8} color="#ff6600" distance={6} decay={2} />
+          <pointLight position={[-0.8, 0, -3]} intensity={2.0} color="#ff6600" distance={10} decay={1} />
+          <pointLight position={[0.8, 0, -3]} intensity={2.0} color="#ff6600" distance={10} decay={1} />
         </>
       )}
     </group>
