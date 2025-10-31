@@ -1,0 +1,78 @@
+/* ============================================================================ */
+/* CYBER GUY BACKGROUND - PERFECTLY ALIGNED SMALLER SIZE */
+/* ============================================================================ */
+
+.cyber-guy-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full screen width */
+  height: 100vh; /* Full screen height */
+  
+  /* Background settings for perfect alignment - CRITICAL for eye position */
+  background-size: 60%; /* Smaller size but centered in full screen */
+  background-position: center center; /* Perfect center alignment */
+  background-repeat: no-repeat;
+  
+  /* Layering */
+  z-index: -1; /* Behind everything */
+  pointer-events: none;
+  
+  /* Transition for smooth state changes */
+  transition: all 0.8s ease-in-out;
+}
+
+/* ============================================================================ */
+/* ANIMATION STATES */
+/* ============================================================================ */
+
+.cyber-guy-background.dormant {
+  opacity: 0.4;
+  filter: brightness(0.6) contrast(1.1) saturate(0.8);
+  box-shadow: 
+    0 0 30px rgba(0, 0, 0, 0.8),
+    inset 0 0 100px rgba(0, 50, 100, 0.1);
+}
+
+.cyber-guy-background.awakening {
+  opacity: 0.6;
+  filter: brightness(0.8) contrast(1.2) saturate(1.0);
+  box-shadow: 
+    0 0 40px rgba(0, 100, 200, 0.3),
+    inset 0 0 80px rgba(0, 150, 255, 0.1);
+}
+
+.cyber-guy-background.active {
+  opacity: 0.75;
+  filter: brightness(1.0) contrast(1.3) saturate(1.2);
+  box-shadow: 
+    0 0 50px rgba(0, 200, 255, 0.4),
+    inset 0 0 60px rgba(0, 255, 255, 0.15);
+}
+
+.cyber-guy-background.fully-lit {
+  opacity: 0.9;
+  filter: brightness(1.2) contrast(1.4) saturate(1.4);
+  box-shadow: 
+    0 0 80px rgba(0, 255, 255, 0.6),
+    0 0 120px rgba(255, 0, 100, 0.2),
+    inset 0 0 40px rgba(0, 255, 255, 0.2);
+}
+
+/* ============================================================================ */
+/* RESPONSIVE SIZING */
+/* ============================================================================ */
+
+@media (max-width: 768px) {
+  .cyber-guy-background {
+    background-size: 70%; /* Slightly bigger on mobile but still centered */
+    background-position: center center; /* Ensure centering */
+  }
+}
+
+@media (max-width: 480px) {
+  .cyber-guy-background {
+    background-size: 80%; /* Bigger on small mobile but still centered */
+    background-position: center center; /* Ensure centering */
+  }
+}
