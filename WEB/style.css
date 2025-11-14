@@ -1,0 +1,412 @@
+/* ============================================================================ */
+/* KILLGORITHM - VIDEOGAME LANDING PAGE STYLES */
+/* ============================================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Orbitron', monospace;
+    background: #000;
+    color: #fff;
+    overflow-x: hidden;
+    cursor: none; /* Custom cursor for videogame feel */
+}
+
+/* Custom Cursor */
+body::after {
+    content: '◉';
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 10000;
+    font-size: 20px;
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff;
+    animation: cursor-pulse 1s infinite;
+}
+
+@keyframes cursor-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ============================================================================ */
+/* THE GUY - ANIMATED BACKGROUND */
+/* ============================================================================ */
+
+.cyber-guy-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: guy-breathing 4s ease-in-out infinite;
+}
+
+.guy-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 17, 34, 0.1) 0%,
+        rgba(0, 0, 0, 0.3) 70%,
+        rgba(0, 0, 0, 0.8) 100%
+    );
+    animation: cosmic-pulse 6s ease-in-out infinite;
+}
+
+@keyframes guy-breathing {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+@keyframes cosmic-pulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 0.6; }
+}
+
+/* Guy Animation States */
+.cyber-guy-background.dormant { opacity: 0.3; }
+.cyber-guy-background.awakening { 
+    opacity: 0.4; 
+    box-shadow: inset 0 0 100px rgba(0, 150, 255, 0.1);
+}
+.cyber-guy-background.active { 
+    opacity: 0.5; 
+    box-shadow: inset 0 0 150px rgba(0, 150, 255, 0.2);
+}
+.cyber-guy-background.fully-lit { 
+    opacity: 0.6; 
+    box-shadow: inset 0 0 200px rgba(0, 255, 255, 0.3);
+}
+
+/* ============================================================================ */
+/* LIGHTNING EFFECTS */
+/* ============================================================================ */
+
+#lightning-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ============================================================================ */
+/* KILLGORITHM TITLE */
+/* ============================================================================ */
+
+.killgorithm-title {
+    position: absolute;
+    top: 10vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    text-align: center;
+}
+
+#title-image {
+    max-width: 600px;
+    width: 90vw;
+    height: auto;
+    filter: 
+        brightness(1.2) 
+        contrast(1.3) 
+        drop-shadow(0 0 20px rgba(255, 0, 0, 0.5))
+        drop-shadow(0 0 40px rgba(255, 0, 0, 0.3));
+    animation: title-emerge 3s ease-out, title-pulse 4s ease-in-out infinite 3s;
+}
+
+@keyframes title-emerge {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) rotateY(90deg);
+        filter: brightness(0) contrast(0);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1) rotateY(0deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotateY(0deg);
+        filter: 
+            brightness(1.2) 
+            contrast(1.3) 
+            drop-shadow(0 0 20px rgba(255, 0, 0, 0.5));
+    }
+}
+
+@keyframes title-pulse {
+    0%, 100% {
+        filter: 
+            brightness(1.2) 
+            contrast(1.3) 
+            drop-shadow(0 0 20px rgba(255, 0, 0, 0.5));
+    }
+    50% {
+        filter: 
+            brightness(1.5) 
+            contrast(1.5) 
+            drop-shadow(0 0 30px rgba(255, 0, 0, 0.8))
+            drop-shadow(0 0 60px rgba(255, 0, 0, 0.4));
+    }
+}
+
+.title-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(ellipse, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+    animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* ============================================================================ */
+/* AVATAR SHOWCASE */
+/* ============================================================================ */
+
+.avatar-showcase {
+    position: absolute;
+    bottom: 15vh;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 80px;
+    z-index: 50;
+}
+
+.avatar-container {
+    position: relative;
+    width: 300px;
+    height: 400px;
+    background: linear-gradient(135deg, rgba(0, 17, 34, 0.8), rgba(0, 34, 68, 0.4));
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+.avatar-container:hover {
+    transform: translateY(-20px) scale(1.05);
+    border-color: rgba(0, 255, 255, 0.8);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(0, 255, 255, 0.3),
+        inset 0 0 30px rgba(0, 255, 255, 0.1);
+}
+
+.avatar-3d {
+    width: 100%;
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-info {
+    padding: 20px;
+    text-align: center;
+}
+
+.avatar-info h3 {
+    font-size: 1.2em;
+    font-weight: 900;
+    color: #00ffff;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.avatar-info p {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9em;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.play-button {
+    background: linear-gradient(45deg, #ff0040, #ff4000);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    color: white;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.play-button:hover {
+    background: linear-gradient(45deg, #ff4000, #ff8000);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(255, 0, 64, 0.5);
+}
+
+.avatar-effects {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.avatar-container:hover .avatar-effects {
+    opacity: 1;
+}
+
+/* Coming Soon Placeholder */
+.coming-soon {
+    background: linear-gradient(135deg, rgba(17, 17, 17, 0.8), rgba(34, 34, 34, 0.4));
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+}
+
+.placeholder-glow {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+    animation: placeholder-pulse 2s ease-in-out infinite;
+}
+
+@keyframes placeholder-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.5); }
+}
+
+.avatar-placeholder span {
+    font-size: 1.1em;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.5;
+    color: #666;
+    z-index: 1;
+}
+
+/* ============================================================================ */
+/* LOADING SCREEN */
+/* ============================================================================ */
+
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #000011, #001122);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 1s ease;
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(0, 255, 255, 0.3);
+    border-top: 3px solid #00ffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 30px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-content p {
+    font-family: 'Share Tech Mono', monospace;
+    color: #00ffff;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.loading-bar {
+    width: 300px;
+    height: 4px;
+    background: rgba(0, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.loading-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #00ffff, #0080ff);
+    border-radius: 2px;
+    width: 0%;
+    animation: loading-progress 3s ease-out forwards;
+}
+
+@keyframes loading-progress {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+/* ============================================================================ */
+/* RESPONSIVE DESIGN */
+/* ============================================================================ */
+
+@media (max-width: 768px) {
+    .avatar-showcase {
+        flex-direction: column;
+        gap: 40px;
+        align-items: center;
+    }
+    
+    .avatar-container {
+        width: 250px;
+        height: 350px;
+    }
+    
+    #title-image {
+        max-width: 400px;
+    }
+}

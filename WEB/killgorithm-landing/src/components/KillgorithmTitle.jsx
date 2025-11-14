@@ -23,10 +23,13 @@ function KillgorithmTitle() {
         delay: 0.5
       }}
     >
-      <motion.img
-        src="/kill.png"
-        alt="KILLGORITHM"
-        className="title-image"
+      <motion.video
+        src="/letters.mov"
+        className="title-video"
+        autoPlay
+        loop
+        muted
+        playsInline
         whileHover={{ 
           scale: 1.05,
           filter: "brightness(1.3) drop-shadow(0 0 30px rgba(255, 0, 0, 0.8))"

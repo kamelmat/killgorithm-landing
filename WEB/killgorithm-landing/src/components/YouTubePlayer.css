@@ -1,0 +1,262 @@
+/* ============================================================================ */
+/* YOUTUBE VIDEO PLAYER - CYBER AESTHETIC */
+/* ============================================================================ */
+
+.youtube-player {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* transform handled by Framer Motion */
+  
+  width: 90vw;
+  max-width: 800px;
+  max-height: 90vh;
+  
+  background: rgba(0, 20, 40, 0.95);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(0, 255, 255, 0.4);
+  border-radius: 15px;
+  
+  z-index: 100; /* Above everything else */
+  
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 30px rgba(0, 255, 255, 0.2);
+  
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.youtube-player.minimized {
+  width: 350px;
+  max-width: 350px;
+  top: auto;
+  bottom: 80px; /* Above music player when minimized */
+}
+
+/* Video Player Glow Effect */
+.video-glow {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 255, 255, 0.1) 0%,
+    rgba(0, 100, 200, 0.05) 50%,
+    transparent 70%
+  );
+  
+  border-radius: 20px;
+  z-index: -1;
+  
+  animation: videoGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes videoGlow {
+  0% { 
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  100% { 
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+/* ============================================================================ */
+/* VIDEO HEADER */
+/* ============================================================================ */
+
+.video-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  
+  background: rgba(0, 30, 60, 0.8);
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.video-title h3 {
+  color: #00ffff;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.video-subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.video-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.video-btn {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 8px;
+  
+  width: 36px;
+  height: 36px;
+  
+  color: #00ffff;
+  font-size: 1rem;
+  
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-btn:hover:not(:disabled) {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: rgba(0, 255, 255, 0.6);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.video-btn:active {
+  transform: scale(0.95);
+}
+
+.video-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.close-btn:hover {
+  background: rgba(255, 50, 50, 0.2) !important;
+  border-color: rgba(255, 50, 50, 0.6) !important;
+  color: #ff3333 !important;
+}
+
+/* ============================================================================ */
+/* VIDEO CONTAINER */
+/* ============================================================================ */
+
+.video-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+}
+
+.youtube-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0 0 13px 13px;
+}
+
+/* ============================================================================ */
+/* MINIMIZED STATE */
+/* ============================================================================ */
+
+.minimized-info {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  background: rgba(0, 40, 80, 0.6);
+  border-top: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.audio-indicator {
+  color: #00ffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+}
+
+.expand-hint {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* ============================================================================ */
+/* RESPONSIVE DESIGN */
+/* ============================================================================ */
+
+@media (max-width: 768px) {
+  .youtube-player {
+    width: 95vw;
+    max-width: 95vw;
+  }
+  
+  .youtube-player.minimized {
+    width: 320px;
+    max-width: 320px;
+    bottom: 70px;
+  }
+  
+  .video-header {
+    padding: 12px 15px;
+  }
+  
+  .video-title h3 {
+    font-size: 1.1rem;
+  }
+  
+  .video-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .youtube-player {
+    width: 98vw;
+    max-width: 98vw;
+  }
+  
+  .youtube-player.minimized {
+    width: 280px;
+    max-width: 280px;
+    bottom: 60px;
+  }
+  
+  .video-header {
+    padding: 10px 12px;
+  }
+  
+  .video-title h3 {
+    font-size: 1rem;
+  }
+  
+  .video-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .video-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+  
+  .video-controls {
+    gap: 6px;
+  }
+}

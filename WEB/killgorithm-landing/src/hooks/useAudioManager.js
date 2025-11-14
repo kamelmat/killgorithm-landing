@@ -1,7 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 
+const SONGS = [
+  { id: 'nemos-tears', title: 'Nemo\'s Tears', file: '/audio/nemos-tears.mp3' },
+  { id: 'ave-de-presa', title: 'Ave de Presa', file: '/audio/AVE DE PRESA v10.mp3' },
+  { id: 'to-hell-and-back', title: 'To Hell & Back', file: '/audio/To Hell & Back To Hel v8.mp3' },
+  { id: 'courage', title: 'Courage', file: '/audio/COURAGE MIX AUG 24.mp3' }
+]
+
 export function useAudioManager() {
   const [audioManager, setAudioManager] = useState(null)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
   const audioRef = useRef(null)
 
   useEffect(() => {
@@ -25,6 +34,8 @@ export function useAudioManager() {
         this.audio.addEventListener('ended', () => {
           console.log('🎵🔚 Audio ended')
           this.isPlaying = false
+          // Auto-advance to next song
+          this.playNext()
         })
         
         this.audio.addEventListener('error', (e) => {
@@ -37,6 +48,14 @@ export function useAudioManager() {
         
         this.audio.addEventListener('canplay', () => {
           console.log('🎵✅ Audio can play')
+        })
+        
+        this.audio.addEventListener('timeupdate', () => {
+          setCurrentTime(this.audio.currentTime)
+        })
+        
+        this.audio.addEventListener('durationchange', () => {
+          setDuration(this.audio.duration)
         })
         
         console.log('🎵🔧 AudioManager initialized successfully')
@@ -108,6 +127,34 @@ export function useAudioManager() {
 
       getDuration() {
         return this.audio ? this.audio.duration : 0
+      },
+
+      seek(time) {
+        if (this.audio) {
+          this.audio.currentTime = time
+        }
+      },
+
+      playNext() {
+        const currentIndex = SONGS.findIndex(song => song.id === this.currentSong)
+        if (currentIndex < SONGS.length - 1) {
+          const nextSong = SONGS[currentIndex + 1]
+          console.log('🎵⏭ Auto-advancing to next song:', nextSong.title)
+          this.playSong(nextSong.id, nextSong.file)
+          return nextSong.id
+        }
+        return null
+      },
+
+      playPrevious() {
+        const currentIndex = SONGS.findIndex(song => song.id === this.currentSong)
+        if (currentIndex > 0) {
+          const prevSong = SONGS[currentIndex - 1]
+          console.log('🎵⏮ Going to previous song:', prevSong.title)
+          this.playSong(prevSong.id, prevSong.file)
+          return prevSong.id
+        }
+        return null
       }
     }
 
@@ -123,5 +170,5 @@ export function useAudioManager() {
     }
   }, [])
 
-  return { audioManager }
+  return { audioManager, currentTime, duration }
 }

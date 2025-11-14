@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KILLGORITHM - Thrash Metal Immersion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+    <!-- THE GUY - Animated Background -->
+    <div id="cyber-guy-background" class="cyber-guy-background">
+        <div class="guy-overlay"></div>
+    </div>
+    
+    <!-- Lightning Effects Canvas -->
+    <canvas id="lightning-canvas"></canvas>
+    
+    <!-- KILLGORITHM Title Animation -->
+    <div class="killgorithm-title">
+        <img src="Killgorithm.jpg" alt="KILLGORITHM" id="title-image">
+        <div class="title-glow"></div>
+        <div class="title-sparks"></div>
+    </div>
+    
+    <!-- Avatar Showcase -->
+    <div class="avatar-showcase">
+        <!-- Nemo's Tears -->
+        <div class="avatar-container" data-song="nemos-tears">
+            <div class="avatar-3d" id="nemo-avatar"></div>
+            <div class="avatar-info">
+                <h3>NEMO'S TEARS</h3>
+                <p>Deep Sea Assault</p>
+                <button class="play-button">ENTER THE ABYSS</button>
+            </div>
+            <div class="avatar-effects"></div>
+        </div>
+        
+        <!-- Ave de Presa -->
+        <div class="avatar-container" data-song="ave-de-presa">
+            <div class="avatar-3d" id="eagle-avatar"></div>
+            <div class="avatar-info">
+                <h3>AVE DE PRESA</h3>
+                <p>Aerial Domination</p>
+                <button class="play-button">SOAR INTO BATTLE</button>
+            </div>
+            <div class="avatar-effects"></div>
+        </div>
+        
+        <!-- Placeholder for future avatars -->
+        <div class="avatar-container coming-soon">
+            <div class="avatar-placeholder">
+                <div class="placeholder-glow"></div>
+                <span>MORE WARRIORS<br>COMING SOON</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Audio Player (Hidden) -->
+    <audio id="audio-player" preload="none"></audio>
+    
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>INITIALIZING THRASH PROTOCOL...</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

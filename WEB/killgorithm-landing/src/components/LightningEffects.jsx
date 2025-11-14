@@ -35,8 +35,8 @@ function LightningEffects() {
     initParticles()
 
     const drawLightning = () => {
-      // Random lightning strikes (rare)
-      if (Math.random() < 0.008) { // 0.8% chance per frame
+      // More regular lightning strikes
+      if (Math.random() < 0.025) { // 2.5% chance per frame (more frequent)
         createLightningStrike(ctx, canvas.width, canvas.height)
       }
     }

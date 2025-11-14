@@ -13,7 +13,7 @@
   z-index: 20;
 }
 
-.title-image {
+.title-video {
   max-width: 300px; /* Smaller to not cover the guy */
   width: 40vw; /* Much smaller viewport width */
   height: auto;
@@ -22,9 +22,8 @@
     contrast(1.3) 
     drop-shadow(0 0 20px rgba(255, 0, 0, 0.5));
   transition: all 0.3s ease;
-  /* PNG should have transparent background */
+  /* Video should maintain aspect ratio */
   object-fit: contain;
-  object-position: center;
 }
 
 .title-glow {
@@ -101,7 +100,7 @@
 }
 
 @media (max-width: 768px) {
-  .title-image {
+  .title-video {
     max-width: 250px;
     width: 60vw;
   }

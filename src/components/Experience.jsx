@@ -32,7 +32,7 @@ function Experience({ currentSong, isPlaying, onSongSelect }) {
       {/* Dynamic Lighting based on current song */}
       <DynamicLighting currentSong={currentSong} isPlaying={isPlaying} />
       
-      {/* All Avatars - Each handles its own movement independently */}
+      {/* All Avatars - wrapped in Suspense for GLTF loading */}
       <Suspense fallback={null}>
         {CONFIG.songs.map((song) => {
           const AvatarComponent = AVATAR_COMPONENTS[song.avatar]
