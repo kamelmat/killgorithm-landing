@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test YouTube Div</title>
+</head>
+<body>
+  <h1>Test</h1>
+  <script>
+    console.log('Creating test div...');
+    const div = document.createElement('div');
+    div.id = 'test-youtube-player';
+    div.style.position = 'fixed';
+    div.style.bottom = '20px';
+    div.style.right = '20px';
+    div.style.width = '320px';
+    div.style.height = '180px';
+    div.style.backgroundColor = 'red';
+    div.style.border = '5px solid yellow';
+    div.style.zIndex = '99999';
+    div.innerHTML = '<h2 style="color: white; text-align: center; padding-top: 70px;">TEST DIV</h2>';
+    document.body.appendChild(div);
+    console.log('Test div appended:', document.getElementById('test-youtube-player'));
+  </script>
+</body>
+</html>

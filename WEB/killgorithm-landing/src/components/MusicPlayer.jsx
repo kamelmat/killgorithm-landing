@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+// import SyncedLyrics from './SyncedLyrics' // DISABLED FOR NOW - needs timing work
 import './MusicPlayer.css'
 
 const SONGS = [
@@ -19,11 +20,20 @@ function MusicPlayer({
   onSeek,
   currentTime = 0,
   duration = 0,
-  isVisible = false 
+  isVisible = false,
+  onMinimizedChange // New prop to notify parent about minimize state
 }) {
   const [isDragging, setIsDragging] = useState(false)
   const [localProgress, setLocalProgress] = useState(0)
   const [isMinimized, setIsMinimized] = useState(false)
+  // const [showLyrics, setShowLyrics] = useState(false) // DISABLED FOR NOW
+
+  // Notify parent when minimized state changes
+  useEffect(() => {
+    if (onMinimizedChange) {
+      onMinimizedChange(isMinimized)
+    }
+  }, [isMinimized, onMinimizedChange])
 
   const currentSongData = SONGS.find(song => song.id === selectedSong)
   const currentIndex = SONGS.findIndex(song => song.id === selectedSong)
@@ -221,6 +231,17 @@ function MusicPlayer({
               >
                 <span className="control-icon">⏭</span>
               </motion.button>
+
+              {/* Lyrics Button - DISABLED FOR NOW */}
+              {/* <motion.button
+                className={`control-btn lyrics-btn ${showLyrics ? 'active' : ''}`}
+                onClick={() => setShowLyrics(!showLyrics)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                title="Show lyrics"
+              >
+                <span className="control-icon">♫</span>
+              </motion.button> */}
             </div>
           </motion.div>
 
@@ -246,6 +267,14 @@ function MusicPlayer({
           </div>
         </motion.div>
       )}
+      
+      {/* Synced Lyrics Panel - DISABLED FOR NOW */}
+      {/* <SyncedLyrics 
+        songId={selectedSong}
+        currentTime={currentTime}
+        isVisible={showLyrics && isVisible}
+        onClose={() => setShowLyrics(false)}
+      /> */}
     </AnimatePresence>
   )
 }

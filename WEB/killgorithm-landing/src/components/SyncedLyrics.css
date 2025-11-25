@@ -1,0 +1,297 @@
+/* ============================================================================ */
+/* SYNCED LYRICS - SPOTIFY-STYLE OVERLAY */
+/* ============================================================================ */
+
+.synced-lyrics-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  
+  z-index: 85;
+  
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+/* ============================================================================ */
+/* LYRICS PANEL */
+/* ============================================================================ */
+
+.synced-lyrics-panel {
+  position: relative;
+  
+  width: 90%;
+  max-width: 500px;
+  height: 80vh;
+  max-height: 700px;
+  
+  background: rgba(0, 20, 40, 0.95);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(0, 255, 255, 0.4);
+  border-radius: 20px;
+  
+  overflow: hidden;
+  
+  display: flex;
+  flex-direction: column;
+  
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 40px rgba(0, 255, 255, 0.2);
+}
+
+.lyrics-glow {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 255, 255, 0.15) 0%,
+    rgba(0, 100, 200, 0.08) 50%,
+    transparent 70%
+  );
+  
+  border-radius: 25px;
+  z-index: -1;
+  
+  animation: lyricsGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes lyricsGlow {
+  0% { 
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% { 
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}
+
+/* ============================================================================ */
+/* LYRICS HEADER */
+/* ============================================================================ */
+
+.lyrics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px;
+  
+  background: rgba(0, 30, 60, 0.8);
+  border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+  
+  flex-shrink: 0;
+}
+
+.lyrics-title {
+  color: #00ffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 2px;
+  text-shadow: 
+    0 0 10px rgba(0, 255, 255, 0.6),
+    0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.lyrics-close {
+  background: rgba(255, 50, 50, 0.1);
+  border: 1px solid rgba(255, 50, 50, 0.3);
+  border-radius: 8px;
+  
+  width: 40px;
+  height: 40px;
+  
+  color: #ff3333;
+  font-size: 1.2rem;
+  font-weight: bold;
+  
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lyrics-close:hover {
+  background: rgba(255, 50, 50, 0.2);
+  border-color: rgba(255, 50, 50, 0.6);
+  box-shadow: 0 0 15px rgba(255, 50, 50, 0.3);
+  transform: scale(1.05);
+}
+
+/* ============================================================================ */
+/* LYRICS CONTENT */
+/* ============================================================================ */
+
+.lyrics-content {
+  flex: 1;
+  padding: 40px 30px;
+  overflow-y: auto;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 255, 0.5) rgba(0, 20, 40, 0.3);
+}
+
+.lyrics-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.lyrics-content::-webkit-scrollbar-track {
+  background: rgba(0, 20, 40, 0.3);
+  border-radius: 4px;
+}
+
+.lyrics-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.5);
+  border-radius: 4px;
+}
+
+.lyrics-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 255, 0.7);
+}
+
+/* ============================================================================ */
+/* LYRICS LINES */
+/* ============================================================================ */
+
+.lyrics-line {
+  font-size: 1.3rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  min-height: 1.5em;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lyrics-line.past {
+  color: rgba(255, 255, 255, 0.4);
+  opacity: 0.4;
+}
+
+.lyrics-line.active {
+  color: #00ffff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  opacity: 1;
+  text-shadow: 
+    0 0 10px rgba(0, 255, 255, 0.6),
+    0 0 20px rgba(0, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* ============================================================================ */
+/* RESPONSIVE DESIGN */
+/* ============================================================================ */
+
+@media (max-width: 768px) {
+  .synced-lyrics-overlay {
+    padding: 0;
+    justify-content: center;
+  }
+  
+  .synced-lyrics-panel {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+    border-top: 2px solid rgba(0, 255, 255, 0.4);
+  }
+  
+  .lyrics-header {
+    padding: 20px 25px;
+  }
+  
+  .lyrics-title {
+    font-size: 1.3rem;
+  }
+  
+  .lyrics-close {
+    width: 35px;
+    height: 35px;
+    font-size: 1.1rem;
+  }
+  
+  .lyrics-content {
+    padding: 30px 20px;
+    gap: 18px;
+  }
+  
+  .lyrics-line {
+    font-size: 1.1rem;
+  }
+  
+  .lyrics-line.active {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .lyrics-header {
+    padding: 15px 20px;
+  }
+  
+  .lyrics-title {
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+  }
+  
+  .lyrics-close {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+  
+  .lyrics-content {
+    padding: 25px 15px;
+    gap: 15px;
+  }
+  
+  .lyrics-line {
+    font-size: 1rem;
+  }
+  
+  .lyrics-line.active {
+    font-size: 1.2rem;
+  }
+}
+
+/* ============================================================================ */
+/* DESKTOP SPECIFIC - SIDE PANEL */
+/* ============================================================================ */
+
+@media (min-width: 769px) {
+  .synced-lyrics-overlay {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  .synced-lyrics-panel {
+    margin-right: 0;
+  }
+}
+

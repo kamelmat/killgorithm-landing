@@ -2,6 +2,15 @@
 /* KILLGORITHM LEGEND - INFO ICON & MODAL */
 /* ============================================================================ */
 
+/* Import Robocode Font */
+@font-face {
+  font-family: 'Robocode';
+  src: url('/Robocode-ov3vx.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Info Icon - Fixed position */
 .legend-icon {
   position: fixed;
@@ -228,7 +237,19 @@
   color: rgba(255, 255, 255, 0.9);
   font-size: 1.1rem;
   line-height: 1.8;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Orbitron', monospace;
+  font-weight: 400;
+}
+
+.legend-text h3 {
+  color: #00ffff;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-shadow: 
+    0 0 10px rgba(0, 255, 255, 0.6),
+    0 0 20px rgba(0, 255, 255, 0.3);
 }
 
 .legend-text p {

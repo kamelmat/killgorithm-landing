@@ -1,0 +1,61 @@
+/* YouTube Audio Player Styling */
+#youtube-audio-player {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  height: 180px;
+  z-index: 60; /* Above avatars (50), below modals (85+) */
+  
+  border: 2px solid rgba(0, 255, 255, 0.4);
+  border-radius: 15px;
+  overflow: hidden;
+  
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(0, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  
+  backdrop-filter: blur(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Cyber glow animation */
+@keyframes youtubePlayerGlow {
+  0%, 100% { 
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.6),
+      0 0 30px rgba(0, 255, 255, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  50% { 
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.6),
+      0 0 50px rgba(0, 255, 255, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+}
+
+#youtube-audio-player {
+  animation: youtubePlayerGlow 3s ease-in-out infinite;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  #youtube-audio-player {
+    bottom: 15px;
+    right: 15px;
+    width: 280px;
+    height: 157px;
+  }
+}
+
+@media (max-width: 480px) {
+  #youtube-audio-player {
+    bottom: 10px;
+    right: 10px;
+    width: 240px;
+    height: 135px;
+  }
+}
+

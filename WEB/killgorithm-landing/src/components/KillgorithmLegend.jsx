@@ -131,6 +131,13 @@ function KillgorithmLegend() {
                     If it resonates with you,<br/>
                     you already know why.
                   </p>
+                  
+                  <p style={{ marginTop: '3rem', textAlign: 'center', fontSize: '1rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+                    Feel like reaching out?<br/>
+                    <a href="mailto:killgorithm666@gmail.com" style={{ color: '#00ffff', textDecoration: 'none', transition: 'all 0.3s ease' }}>
+                      killgorithm666@gmail.com
+                    </a>
+                  </p>
                 </div>
               </div>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import CyberGuyBackground from './components/CyberGuyBackground'
 import KillgorithmTitle from './components/KillgorithmTitle'
 import AvatarShowcase from './components/AvatarShowcase'
@@ -7,16 +7,33 @@ import LoadingScreen from './components/LoadingScreen'
 import MusicPlayer from './components/MusicPlayer'
 import YouTubePlayer from './components/YouTubePlayer'
 import KillgorithmLegend from './components/KillgorithmLegend'
-import { useAudioManager } from './hooks/useAudioManager'
+import { useAudioManager } from './hooks/useYouTubeAudioManager' // Switched to YouTube streaming
 import './App.css'
+import './styles/youtube-player.css'
 
 function App() {
+  console.log('🎸🆕 NEW App.jsx - Version 2.0 - RENDERING!')
+  
   const [isLoading, setIsLoading] = useState(true)
   const [selectedSong, setSelectedSong] = useState(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [showVideo, setShowVideo] = useState(false)
   const [videoTriggered, setVideoTriggered] = useState(false) // Track if video was clicked
-  const { audioManager, currentTime, duration } = useAudioManager()
+  const [isPlayerMinimized, setIsPlayerMinimized] = useState(false)
+  
+  // YouTube player visibility: show when playing, hide when video showing or minimized
+  const showYouTubePlayer = isPlaying && !showVideo && !isPlayerMinimized
+  
+  const { audioManager, currentTime, duration, updatePlayerVisibility } = useAudioManager()
+  
+  // Use useLayoutEffect to update visibility synchronously before paint
+  useLayoutEffect(() => {
+    console.log('⚡ useLayoutEffect triggered - showYouTubePlayer:', showYouTubePlayer, 'isPlaying:', isPlaying)
+    if (updatePlayerVisibility) {
+      updatePlayerVisibility(showYouTubePlayer)
+      console.log('⚡ Called updatePlayerVisibility with:', showYouTubePlayer)
+    }
+  }, [showYouTubePlayer, updatePlayerVisibility])
 
   useEffect(() => {
     // Simulate loading time for dramatic effect
@@ -28,27 +45,8 @@ function App() {
   }, [])
 
   useEffect(() => {
-    console.log('🎵🏗️ App: audioManager changed:', !!audioManager)
-    if (audioManager) {
-      console.log('🎵🏗️ App: Calling audioManager.initialize()...')
-      audioManager.initialize()
-      console.log('🎵🏗️ App: AudioManager initialization complete')
-    }
+    // AudioManager ready - YouTube manager self-initializes
   }, [audioManager])
-
-  // Update isPlaying state when audio manager state changes
-  useEffect(() => {
-    if (audioManager) {
-      const checkPlayingState = () => {
-        const playing = audioManager.getIsPlaying()
-        if (playing !== isPlaying) {
-          setIsPlaying(playing)
-        }
-      }
-      const interval = setInterval(checkPlayingState, 100)
-      return () => clearInterval(interval)
-    }
-  }, [audioManager, isPlaying])
 
   // Handle avatar clicks - show video for Nemo's Tears, audio for others
   const handleAvatarClick = (songId) => {
@@ -57,6 +55,14 @@ function App() {
     // Special handling for Nemo's Tears - show video
     if (songId === 'nemos-tears') {
       console.log('🎬 Opening video for Nemo\'s Tears')
+      
+      // BUGFIX: Pause music player if it's playing
+      if (audioManager && isPlaying) {
+        console.log('🎬 Pausing music player to prevent overlap')
+        audioManager.pause()
+        setIsPlaying(false)
+      }
+      
       setShowVideo(true)
       setVideoTriggered(true)
       setSelectedSong(songId)
@@ -70,9 +76,6 @@ function App() {
 
   // Handle song selection from music player or direct audio play
   const handleSongSelect = (songId, fromMusicPlayer = true) => {
-    console.log(`🎵 Song selected: ${songId}, fromMusicPlayer: ${fromMusicPlayer}`)
-    console.log('🎵 Audio manager available:', !!audioManager)
-    console.log('🎵 Current state - selectedSong:', selectedSong, 'isPlaying:', isPlaying)
     
     // If triggered from music player, don't show video
     if (fromMusicPlayer) {
@@ -82,7 +85,6 @@ function App() {
     
     // If the same song is playing, pause it
     if (selectedSong === songId && isPlaying) {
-      console.log('🎵 ⏸️ Pausing current song...')
       audioManager.pause()
       setIsPlaying(false)
       return
@@ -90,31 +92,20 @@ function App() {
     
     // If the same song is paused, resume it
     if (selectedSong === songId && !isPlaying) {
-      console.log('🎵 ▶️ Resuming current song...')
       audioManager.play()
       setIsPlaying(true)
       return
     }
     
-    // Play new song
-    const songFiles = {
-      'nemos-tears': '/audio/nemos-tears.mp3',
-      'ave-de-presa': '/audio/AVE DE PRESA v10.mp3',
-      'to-hell-and-back': '/audio/To Hell & Back To Hel v8.mp3',
-      'courage': '/audio/COURAGE MIX AUG 24.mp3'
-    }
-    
-    const audioFile = songFiles[songId]
-    console.log('🎵 Audio file for', songId, ':', audioFile)
-    
-    if (audioManager && audioFile) {
-      console.log('🎵 🎶 Playing new song...')
-      audioManager.playSong(songId, audioFile)
+    // Play new song - Now using YouTube streaming
+    if (audioManager) {
       setSelectedSong(songId)
       setIsPlaying(true)
-      console.log('🎵 State updated - selectedSong:', songId, 'isPlaying: true')
+      console.log('✅ setIsPlaying(true) called - isPlaying should now be true')
+      // Call playSong AFTER setting state to avoid race conditions
+      setTimeout(() => audioManager.playSong(songId), 0)
     } else {
-      console.warn('🎵 Cannot play - audioManager:', !!audioManager, 'audioFile:', audioFile)
+      console.warn('🎵 Cannot play - audioManager not ready')
     }
   }
 
@@ -166,16 +157,20 @@ function App() {
   }
 
   const handlePlay = () => {
+    console.log('🎵▶️ App handlePlay called')
     if (audioManager) {
       audioManager.play()
       setIsPlaying(true)
+      console.log('🎵▶️ App setIsPlaying(true)')
     }
   }
 
   const handlePause = () => {
+    console.log('🎵⏸️ App handlePause called')
     if (audioManager) {
       audioManager.pause()
       setIsPlaying(false)
+      console.log('🎵⏸️ App setIsPlaying(false)')
     }
   }
 
@@ -216,6 +211,7 @@ function App() {
         currentTime={currentTime}
         duration={duration}
         isVisible={!!selectedSong}
+        onMinimizedChange={setIsPlayerMinimized}
       />
 
       {/* YouTube Video Player - Shows for Nemo's Tears */}
