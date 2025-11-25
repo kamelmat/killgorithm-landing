@@ -1,64 +1,30 @@
 {
-  "name": "killgorithm-web-experience",
-  "version": "1.0.0",
-  "description": "Immersive web experience for the thrash metal band KILLGORITHM",
-  "main": "index.html",
+  "name": "killgorithm-landing",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "start": "vite",
+    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "dev": "vite --open",
-    "serve": "npx serve dist",
-    "test": "echo 'No tests specified'",
-    "lint": "echo 'No linting configured'"
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
-  "keywords": [
-    "music",
-    "metal",
-    "thrash",
-    "web-experience",
-    "threejs",
-    "react-three-fiber",
-    "webgl",
-    "audio",
-    "visualization",
-    "cyberpunk",
-    "interactive",
-    "react"
-  ],
-  "author": "KILLGORITHM",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-username/killgorithm-web-experience.git"
-  },
-  "bugs": {
-    "url": "https://github.com/your-username/killgorithm-web-experience/issues"
-  },
-  "homepage": "https://github.com/your-username/killgorithm-web-experience#readme",
   "dependencies": {
-    "@gsap/react": "^2.1.2",
-    "@react-three/drei": "^9.88.0",
-    "@react-three/fiber": "^8.15.0",
-    "gsap": "^3.13.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "three": "^0.157.0"
+    "@react-three/drei": "^10.7.4",
+    "@react-three/fiber": "^9.3.0",
+    "framer-motion": "^12.23.12",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "@vitejs/plugin-react": "^4.1.0",
-    "serve": "^14.2.0",
-    "vite": "^4.5.0"
-  },
-  "engines": {
-    "node": ">=16.0.0"
-  },
-  "browserslist": [
-    "Chrome >= 80",
-    "Firefox >= 75",
-    "Safari >= 13",
-    "Edge >= 80"
-  ]
+    "@eslint/js": "^9.33.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "vite": "^7.1.2"
+  }
 }
